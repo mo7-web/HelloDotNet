@@ -1,0 +1,20 @@
+{
+  "name": "HelloDotNet",
+  "version": "1.0.0",
+  "description": "dotnet 练习",
+  "type": "module",
+  "private": true,
+  "author": "墨七 mo7cc@outlook.com",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite"
+  },
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.2",
+    "prettier": "^3.9.6"
+  }
+}
