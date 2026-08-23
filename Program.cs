@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Console.WriteLine("The current time is " + DateTime.Now);
 
 string name = "墨七";
@@ -13,49 +13,62 @@ Console.WriteLine("Hello2, " + name2 + "! Welcome to the program.");
 
  */
 
-
 namespace YourNamespace
 {
-  class Program
-  {
-    static void Main()
+    class Program
     {
-      Console.WriteLine("Hello, World! YourNamespace2");
+        static async Task Main()
+        {
+            static void MyFuncMo7()
+            {
+                Console.WriteLine("Hello, MyFuncMo7");
+            }
 
-      var ppppp = new YourNamespace3.Program();
-      ppppp.MyFunc();
+            Console.WriteLine("Hello, World!");
 
+            await Task.Delay(1000);
 
-      YourNamespace2.Program.MyFunc();
+            YourNamespace2.Program.MyFunc();
 
+            await Task.Delay(1000);
 
-      YourNamespace4.Program.MyFunc();
+            var ppppp = new YourNamespace3.Program();
+            ppppp.MyFunc();
+
+            await Task.Delay(1000);
+
+            YourNamespace4.Program.MyFunc();
+
+            await Task.Delay(1000);
+
+            MyFuncMo7();
+
+            await Task.Delay(1000);
+
+            Console.WriteLine("按任意键退出...");
+            Console.ReadKey();
+        }
     }
-  }
 }
 
 namespace YourNamespace2
 {
-  class Program
-  {
-    public static void MyFunc()
+    class Program
     {
-      Console.WriteLine("Hello, YourNamespace2");
+        public static void MyFunc()
+        {
+            Console.WriteLine("Hello, YourNamespace2");
+        }
     }
-  }
 }
-
-
 
 namespace YourNamespace3
 {
-  class Program
-  {
-    public void MyFunc()
+    class Program
     {
-      Console.WriteLine("Hello, YourNamespace3");
+        public void MyFunc()
+        {
+            Console.WriteLine("Hello, YourNamespace3");
+        }
     }
-  }
 }
-
-
