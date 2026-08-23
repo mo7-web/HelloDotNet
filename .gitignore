@@ -4,6 +4,7 @@
 [Ll]og/
 [Ll]ogs/
 dist/
+dist_aot/
 publish/
 *.nupkg
 *.snupkg
