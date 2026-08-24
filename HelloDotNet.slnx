@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/NameSpace/">
+    <Project Path="NameSpace/NameSpaceDemo.csproj" />
+  </Folder>
+  <Project Path="HelloWorld/HelloWorld.csproj" />
+</Solution>
