@@ -1,14 +1,18 @@
-# 1. .NET 编译与发布 (拦截所有二进制、AOT产物与中间缓存)
+# 1. .NET 编译产物、AOT 单文件与中间缓存
 bin/
 obj/
 publish/
 *.user
+*.suo
+TestResults/
 
-# 2. 前端产物与缓存 (Vue 3 / Vite)
+# 4. 前端与脚本环境 (Vue 3 / Vite / Node)
 node_modules/
 dist/
 .eslintcache
+.cache/
 .env.local
+# 多人开发可取消
 pnpm-lock.yaml
 
 # 3. 根目录崩溃日志与运行时日志
@@ -20,7 +24,9 @@ pnpm-lock.yaml
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
 
-# 5. 操作系统垃圾
+# 5. 操作系统缓存
 .DS_Store
 Thumbs.db
