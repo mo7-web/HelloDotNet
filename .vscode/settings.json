@@ -1,26 +1,39 @@
 {
+  // 文件嵌套展示规则
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     ".gitignore": ".gitattributes, .gitmodules, .stignore, .nomedia",
     "README.md": "*.md",
-    "package.json": "*.json, *.yaml, *.yml, *.toml, .env, go.mod, go.sum, config.*, *config.ts, eslint*, .eslint*, .prettier*, *.d.ts, *lock, *json.md5, .browserslistrc"
+    "package.json": "*.json, *.yaml, *.yml, *.toml, .env, go.mod, go.sum, config.*, *config.ts, eslint*, .eslint*, .prettier*, *.d.ts, *lock, *json.md5, .browserslistrc",
+    "*.slnx": "*.sln, Directory.Build.props",
+    "*.csproj": "*.csproj.user"
+  },
+  "files.exclude": {
+    // "node_modules": true, // 隐藏文件夹
   },
 
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
-  },
+  // 基础通用设置
+  "files.eol": "\n",
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
-  "files.eol": "\n",
-  "files.exclude": {
-    // ".vscode": true, // 隐藏文件夹
-    // "node_modules": true, // 隐藏文件夹
-    // ".stfolder": true,
-    // ".obsidian": true
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
   },
-  "cSpell.words": ["Avalonia", "csharp", "dotnet"],
+
+  // C# 专属配置 (绑定 CSharpier 默认)
   "[csharp]": {
     "editor.defaultFormatter": "csharpier.csharpier-vscode"
-  }
+  },
+
+  "cSpell.words": [
+    // 拼写检查忽略词
+    "Avalonia",
+    "csharp",
+    "csharpier",
+    "dotnet",
+    "slnx",
+    "csproj",
+    "axaml"
+  ]
 }
