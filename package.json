@@ -7,13 +7,16 @@
   "author": "墨七 mo7cc@outlook.com",
   "license": "MIT",
   "scripts": {
-    "dev": "vite"
+    "git-sync": "node script/script_git_sync.js",
+    "clear-dir": "git clean -fdX",
+    "format": "prettier --write ."
   },
   "engines": {
     "node": ">=24",
     "pnpm": ">=11"
   },
   "devDependencies": {
+    "execa": "^10.0.1",
     "@prettier/plugin-xml": "^3.4.2",
     "prettier": "^3.9.6"
   }
