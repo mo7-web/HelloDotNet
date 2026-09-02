@@ -39,37 +39,41 @@ dotnet watch test                   # 监听模式运行单测
 
 ```
 
-## 依赖管理
+## 依赖与包管理
 
 ```bash
-# 查看哪些包有新版本（npm outdated）
+# 查看哪些包有新版本（等同于pnpm outdated）
 dotnet list package --outdated
 
 # 安全漏洞审计（等同于 npm audit）
 dotnet list package --vulnerable
 
-# 安装第三方包 (pnpm add) 重复执行等于更新
+# 安装第三方包（等同于 pnpm add，不指定版本默认装最新；重复执行等于更新至最新）
 dotnet add package <NuGet包名>
 
-# 卸载第三方包 (pnpm remove)
+# 安装指定版本的第三方包（等同于 pnpm add pkg@1.2.3）
+dotnet add package <NuGet包名> --version <版本号>
+
+# 卸载第三方包（等同于 pnpm remove）
 dotnet remove package <NuGet包名>
 
-# 引用本地其他模块 (Monorepo 内部依赖)
-dotnet add reference <子项目.csproj>
+# 引用本地其他模块（Monorepo 内部子工程依赖）
+dotnet add reference <子项目.csproj路径>
 
-# 还原并下载所有依赖 (pnpm install)
+# 还原并下载所有依赖（等同于 pnpm install）
 dotnet restore
 
-# 全局安装一次
+# --- 全自动批量依赖升级工具 (等同于 ncu -u) ---
+# 1. 全局安装一次
 dotnet tool install --global dotnet-outdated-tool
-# 一键全自动批量升级
-dotnet-outdated -u
+# 2. 一键批量交互式升级整个解决方案里的所有依赖
+dotnet outdated -u
 
-
-# 如果升级了.NET SDK，安装  .NET Upgrade Assistant（升级助手）
-dotnet tool install --global Microsoft.UpgradeAssistant
-# 在项目目录中执行
-dotnet-upgrade-assistant upgrade
+# --- 跨大版本升级迁移助手 (.NET 大版本迁移) ---
+# 1. 全局安装官方升级助手
+dotnet tool install --global upgrade-assistant
+# 2. 在项目或解决方案根目录执行交互式升级
+upgrade-assistant upgrade
 ```
 
 ## 全平台 Native AOT 极速编译矩阵
