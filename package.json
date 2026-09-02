@@ -1,9 +1,9 @@
 {
   "name": "HelloDotNet",
   "version": "1.0.0",
+  "private": true,
   "description": "dotnet 练习",
   "type": "module",
-  "private": true,
   "author": "墨七 mo7cc@outlook.com",
   "license": "MIT",
   "scripts": {
