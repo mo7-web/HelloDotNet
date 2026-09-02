@@ -33,20 +33,43 @@ dotnet clean
 # 代码自动化规范格式化 (等同于 prettier --write)
 dotnet format
 
-# 包与依赖管理
-# 安装第三方包 (pnpm add)
-dotnet add package <NuGet包名>
-# 卸载第三方包 (pnpm remove)
-dotnet remove package <NuGet包名>
-# 引用本地其他模块 (Monorepo 内部依赖)
-dotnet add reference <子项目.csproj>
-# 还原并下载所有依赖 (pnpm install)
-dotnet restore
-
 # 自动化测试
 dotnet test                         # 运行全部单测
 dotnet watch test                   # 监听模式运行单测
 
+```
+
+## 依赖管理
+
+```bash
+# 查看哪些包有新版本（npm outdated）
+dotnet list package --outdated
+
+# 安全漏洞审计（等同于 npm audit）
+dotnet list package --vulnerable
+
+# 安装第三方包 (pnpm add) 重复执行等于更新
+dotnet add package <NuGet包名>
+
+# 卸载第三方包 (pnpm remove)
+dotnet remove package <NuGet包名>
+
+# 引用本地其他模块 (Monorepo 内部依赖)
+dotnet add reference <子项目.csproj>
+
+# 还原并下载所有依赖 (pnpm install)
+dotnet restore
+
+# 全局安装一次
+dotnet tool install --global dotnet-outdated-tool
+# 一键全自动批量升级
+dotnet-outdated -u
+
+
+# 如果升级了.NET SDK，安装  .NET Upgrade Assistant（升级助手）
+dotnet tool install --global Microsoft.UpgradeAssistant
+# 在项目目录中执行
+dotnet-upgrade-assistant upgrade
 ```
 
 ## 全平台 Native AOT 极速编译矩阵
