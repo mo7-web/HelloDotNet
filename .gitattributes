@@ -1,3 +1,9 @@
-# .gitattributes
-# 强制仓库内所有文本文件统一使用 LF 换行符
+# 全局兜底：文本文件自动统一为 LF，标准二进制文件自动跳过
 * text=auto eol=lf
+
+# 语言专属 Diff 增强（Git 无法自动猜出你想用 C# 语义高亮 Diff）
+*.cs diff=csharp
+
+# 特殊例外（Linux 脚本或 Windows 批处理）
+*.sh text eol=lf
+*.bat text eol=crlf
