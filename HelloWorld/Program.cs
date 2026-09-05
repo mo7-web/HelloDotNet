@@ -54,7 +54,8 @@ void String()
 
 void HelloWorld()
 {
-    Console.WriteLine($"The current time is {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+    var now = DateTime.Now;
+    Console.WriteLine($"The current time is {now:yyyy-MM-dd HH:mm:ss}");
     string name = "墨七";
     Console.WriteLine($"Hello,{name}!");
     var name2 = "墨七2";
