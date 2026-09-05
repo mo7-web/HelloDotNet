@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="HelloWorld/HelloWorld.csproj" />
+  <Project Path="MiniOrderEngine/MiniOrderEngine.csproj" />
   <Project Path="NameSpaceDemo/NameSpaceDemo.csproj" />
 </Solution>

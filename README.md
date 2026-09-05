@@ -18,6 +18,7 @@ dotnet run
 dotnet run --project ./HelloWorld
 dotnet run --project ./NameSpaceDemo
 
+
 # 向程序传递启动参数（使用 -- 分隔）
 dotnet run -- --port 8080 --debug
 
@@ -37,6 +38,10 @@ dotnet format
 dotnet test                         # 运行全部单测
 dotnet watch test                   # 监听模式运行单测
 
+
+# 创建新的解决方案文件（.sln）
+dotnet new sln -n <解决方案名称>
+dotnet sln add <项目路径/项目文件名.csproj>
 ```
 
 ## 依赖与包管理

@@ -12,7 +12,7 @@
         $"""
         population  {population}
         distance    {distance}
-        temperature {temperature} 
+        temperature {temperature}    
         red         {red} 
         pi          {pi}
         gravity     {gravity}
