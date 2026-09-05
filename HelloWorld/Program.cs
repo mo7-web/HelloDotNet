@@ -8,6 +8,17 @@
     double pi = 3.141592653589793;
     float gravity = 9.81f;
     decimal price = 19.99m;
+    Console.WriteLine(
+        $"""
+        population  {population}
+        distance    {distance}
+        temperature {temperature} 
+        red         {red} 
+        pi          {pi}
+        gravity     {gravity}
+        price       {price}
+        """
+    );
 }
 
 void String()
@@ -26,18 +37,32 @@ void String()
     string raw = $"""
         Found {dec} items in "{greeting}"    
         """; // raw + interpolated
+
+    Console.WriteLine(
+        $"""
+        newline  {newline}
+        unicode  {unicode}
+        greeting {greeting} 
+        dec      {dec} 
+        message  {message}
+        path     {path}
+        json     {json}
+        raw      {raw}
+        """
+    );
 }
 
-Console.WriteLine("The current time is " + DateTime.Now);
+void HelloWorld()
+{
+    Console.WriteLine($"The current time is {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+    string name = "墨七";
+    Console.WriteLine($"Hello,{name}!");
+    var name2 = "墨七2";
+    name2 = name2 + "3";
+    Console.WriteLine("Hello," + name2 + "! ");
 
-string name = "墨七";
+    String();
+    Number();
+}
 
-Console.WriteLine("Hello, " + name + "! Welcome to the program.");
-
-var name2 = "墨七2";
-
-name2 = name2 + "3";
-
-Console.WriteLine("Hello2, " + name2 + "! Welcome to the program.");
-
-public readonly record struct Coords(int X, int Y);
+HelloWorld();
