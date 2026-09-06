@@ -50,7 +50,9 @@ public class FastParser
     // 3. 直接在 Span 切片上进行数字解析（.NET 核心库对 Span 有全套原生支持）
     // 整个解析过程不需要将 Span 转换回 string，直接在原始字符物理地址上扫描！
     if (!decimal.TryParse(priceSpan, out decimal price))
+    {
       return false;
+    }
 
     if (!int.TryParse(volumeSpan, out int volume))
     {
@@ -58,6 +60,7 @@ public class FastParser
     }
 
     result = new ParsedTick(price, volume);
+
     return true;
   }
 }
