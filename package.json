@@ -9,15 +9,17 @@
   "scripts": {
     "git-sync": "node script/script_git_sync.js",
     "clear-dir": "git clean -fdX",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "re-update": "shx rm -rf ./node_modules ./pnpm-lock.yaml && pnpm update"
   },
   "engines": {
     "node": ">=24",
     "pnpm": ">=11"
   },
   "devDependencies": {
-    "execa": "^10.0.1",
     "@prettier/plugin-xml": "^3.4.2",
-    "prettier": "^3.9.6"
+    "execa": "^10.0.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-ini": "^1.3.0"
   }
 }
