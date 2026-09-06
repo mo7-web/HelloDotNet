@@ -8,5 +8,15 @@
     <Nullable>enable</Nullable>
     <!-- 开启 Native AOT，它会自动联锁激活 TrimMode=full、Release下速度优先优化等一系列底层默认值 -->
     <PublishAot>true</PublishAot>
+
+    <!-- 高性能内存与指针支持（默认 false，必须开启） -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- 编译期强制校验 .editorconfig 代码风格（默认 false） -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- AOT 极致优化：禁用全球化库以提升 Parsing 性能，并强制以运行速度优先（AOT 默认不开启） -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <OptimizationPreference>Speed</OptimizationPreference>
   </PropertyGroup>
 </Project>

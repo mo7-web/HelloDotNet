@@ -12,6 +12,9 @@
 # 诊断环境与 SDK、运行时路径
 dotnet --info
 
+# 代码格式化
+dotnet format
+
 # 运行当前目录项目
 dotnet run
 # 运行指定子项目

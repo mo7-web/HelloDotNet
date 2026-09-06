@@ -13,3 +13,6 @@ trim_trailing_whitespace = true
 
 # 开启 C# 10+ 文件范围命名空间（官方默认仍为传统大括号块级命名空间）
 csharp_style_namespace_declarations = file_scoped:warning 
+
+# 强制要求所有控制流（if、else、for 等）必须添加花括号
+csharp_prefer_braces = true:warning
