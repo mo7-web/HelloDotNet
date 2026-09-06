@@ -4,7 +4,7 @@
   "explorer.fileNesting.patterns": {
     ".gitignore": ".gitattributes, .gitmodules, .stignore, .nomedia",
     "README.md": "*.md",
-    "package.json": "*.json, *.yaml, *.yml, *.toml, .env, go.mod, go.sum, config.*, *config.ts, eslint*, .eslint*, .prettier*, *.d.ts, *lock, *json.md5, .browserslistrc",
+    "package.json": "*.json, .editorconfig, *.yaml, *.yml, *.toml, .env, go.mod, go.sum, config.*, *config.ts, eslint*, .eslint*, .prettier*, *.d.ts, *lock, *json.md5, .browserslistrc",
     "*.slnx": "*.sln, Directory.Build.props",
     "*.csproj": "*.csproj.user"
   },
@@ -23,7 +23,12 @@
 
   // C# 专属配置 (绑定 CSharpier 默认)
   "[csharp]": {
-    "editor.defaultFormatter": "csharpier.csharpier-vscode"
+    "editor.defaultFormatter": "csharpier.csharpier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always",
+      "source.fixAll": "always"
+    }
   },
 
   "cSpell.words": [
