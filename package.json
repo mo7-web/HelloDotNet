@@ -9,7 +9,7 @@
   "scripts": {
     "git-sync": "node script/script_git_sync.js",
     "clear-dir": "git clean -fdX",
-    "format": "prettier --write .",
+    "format": "prettier --write . && dotnet format",
     "re-update": "shx rm -rf ./node_modules ./pnpm-lock.yaml && pnpm update"
   },
   "engines": {
