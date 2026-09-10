@@ -1,19 +1,22 @@
 root=true
 
-[*.cs]
-# 覆盖官方默认的 4 空格，改为 2 空格缩进
-indent_size=2
-
-# 统一跨平台换行符为 LF（官方默认跟随系统，如 Windows 的 CRLF）
+# ================= 跨平台与清洁基线（Windows 默认不保证这些，必须显式声明） =================
+[*]
+charset=utf-8
 end_of_line=lf
-
-# 自动清理行尾空格与补全末尾空行（官方默认均为 false）
 insert_final_newline=true
 trim_trailing_whitespace=true
 
-# 开启 C# 10+ 文件范围命名空间（官方默认仍为传统大括号块级命名空间）
-csharp_style_namespace_declarations=file_scoped:warning
+# XML、Avalonia XAML、JSON（保持 2 空格微调）
+indent_style=space
+indent_size=2
 
-# 显式将 IDE0011 规则提升为 warning
-dotnet_diagnostic.IDE0011.severity=warning
+# ================= C# 专属规则 =================
+[*.cs]
+# 必须保留：用于强行覆盖你在 VS Code settings.json 里的全局 2 空格缩进
+indent_style=space
+indent_size=4
+
+# 必须保留：将 .NET 10 默认的静默（silent）升级为 warning，实现保存时全自动规范重构
+csharp_style_namespace_declarations=file_scoped:warning
 csharp_prefer_braces=true:warning

@@ -4,7 +4,12 @@
   "explorer.fileNesting.patterns": {
     ".gitignore": ".gitattributes, .gitmodules, .stignore, .nomedia",
     "README.md": "*.md",
-    "package.json": "*.json, *.yaml, *.yml, *.toml, .env, *config.ts, eslint*, .prettier*"
+    "package.json": ".editorconfig, *.json, *.yaml, *.yml, *.toml, .env, *config.ts, eslint*, .prettier*"
+  },
+
+  // 隐藏文件和目录
+  "files.exclude": {
+    // "node_modules": true, // 隐藏文件夹
   },
 
   // 基础通用设置
@@ -12,13 +17,13 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "files.exclude": {
-    // "node_modules": true, // 隐藏文件夹
-  },
 
+  // C# 相关设置
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
