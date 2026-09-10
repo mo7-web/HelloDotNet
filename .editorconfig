@@ -1,27 +1,32 @@
 root=true
 
-# ================= 跨平台与清洁基线（Windows 默认不保证这些，必须显式声明） =================
+# ================= 全局基线规范（适用于非 C# 文件） =================
 [*]
 charset=utf-8
 end_of_line=lf
 insert_final_newline=true
 trim_trailing_whitespace=true
-
-# XML、Avalonia XAML、JSON（保持 2 空格微调）
 indent_style=space
 indent_size=2
 
-# ================= C# 专属规则 =================
+# ================= C# 专属自动化修复规则 =================
 [*.cs]
-# 必须保留：用于强行覆盖你在 VS Code settings.json 里的全局 2 空格缩进
-indent_style=space
+# 仅保留这一行覆盖缩进尺寸（indent_style 自动继承上级 space）
 indent_size=4
-# 禁止在类型声明（class/struct/interface）的开头留空行
-csharp_style_allow_blank_lines_between_consecutive_braces=false:suggestion
 
-# 限制代码块内连续空行的最大允许数量（设为 1，多余的空行会被 Roslyn 识别并清理）
-dotnet_style_allow_multiple_blank_lines_experimental=false:suggestion
-
-# 必须保留：将 .NET 10 默认的静默（silent）升级为 warning，实现保存时全自动规范重构
+# --- 结构自动化 ---
+# 强制文件范围命名空间（保存时自动把传统大括号拍平成单行 namespace MyApp;）
 csharp_style_namespace_declarations=file_scoped:warning
+
+# 强制要求 if/else/for 必须补全大括号（保存时自动加上 { }）
 csharp_prefer_braces=true:warning
+
+# 保存时自动删除没用到的 using 引用（IDE0005）
+dotnet_diagnostic.IDE0005.severity=warning
+
+# --- 空行压制自动化（必须为 warning 才会触发保存时自动删除多余空行） ---
+# 禁止类/结构体开头留空行
+csharp_style_allow_blank_lines_between_consecutive_braces=false:warning
+
+# 禁止函数内连续出现多个空行（强制压制为最多 1 个空行）
+dotnet_style_allow_multiple_blank_lines_experimental=false:warning
