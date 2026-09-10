@@ -19,6 +19,7 @@
   "editor.tabSize": 2,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
+  "editor.detectIndentation": false, // 禁止 VS Code 自动根据老文件内容猜测缩进
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
