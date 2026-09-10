@@ -9,15 +9,15 @@
   float gravity = 9.81f;
   decimal price = 19.99m;
   Console.WriteLine(
-      $"""
-        population  {population}
-        distance    {distance}
-        temperature {temperature}    
-        red         {red} 
-        pi          {pi}
-        gravity     {gravity}
-        price       {price}
-        """
+    $"""
+    population  {population}
+    distance    {distance}
+    temperature {temperature}    
+    red         {red} 
+    pi          {pi}
+    gravity     {gravity}
+    price       {price}
+    """
   );
 }
 
@@ -32,23 +32,23 @@ void String()
   string message = $"Found {dec} items"; // interpolated string
   string path = @"C:\Users\docs\file.txt"; // verbatim string
   string json = """
-        { "name": "Alice", "age": 30 }
-        """; // raw string literal
+    { "name": "Alice", "age": 30 }
+    """; // raw string literal
   string raw = $"""
-        Found {dec} items in "{greeting}"    
-        """; // raw + interpolated
+    Found {dec} items in "{greeting}"    
+    """; // raw + interpolated
 
   Console.WriteLine(
-      $"""
-        newline  {newline}
-        unicode  {unicode}
-        greeting {greeting} 
-        dec      {dec} 
-        message  {message}
-        path     {path}
-        json     {json}
-        raw      {raw}
-        """
+    $"""
+    newline  {newline}
+    unicode  {unicode}
+    greeting {greeting} 
+    dec      {dec} 
+    message  {message}
+    path     {path}
+    json     {json}
+    raw      {raw}
+    """
   );
 }
 
