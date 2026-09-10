@@ -16,6 +16,11 @@ indent_size=2
 # 必须保留：用于强行覆盖你在 VS Code settings.json 里的全局 2 空格缩进
 indent_style=space
 indent_size=4
+# 禁止在类型声明（class/struct/interface）的开头留空行
+csharp_style_allow_blank_lines_between_consecutive_braces=false:suggestion
+
+# 限制代码块内连续空行的最大允许数量（设为 1，多余的空行会被 Roslyn 识别并清理）
+dotnet_style_allow_multiple_blank_lines_experimental=false:suggestion
 
 # 必须保留：将 .NET 10 默认的静默（silent）升级为 warning，实现保存时全自动规范重构
 csharp_style_namespace_declarations=file_scoped:warning
