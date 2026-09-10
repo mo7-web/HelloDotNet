@@ -1,18 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- 编译目标：指定为可执行文件（控制台应用/Web 服务入口） -->
-    <OutputType>Exe</OutputType>
-    <!-- 运行环境：使用 .NET 10.0 运行时环境 -->
+    <!-- 运行环境：指定目标框架为 .NET 10.0 -->
     <TargetFramework>net10.0</TargetFramework>
-    <!-- 可空引用类型：开启编译器空值检查（有助于在编译阶段捕获 NullReferenceException 隐患） -->
+
+    <!-- 可空引用类型：开启编译器空值检查（在编译阶段捕获潜在的 NullReferenceException） -->
     <Nullable>enable</Nullable>
-    <!-- Native AOT 编译：发布时直接编译为原生机器码，无需依赖 JIT。同时会自动触发全代码裁剪（Full Trimming） -->
+
+    <!-- Native AOT 编译：直接编译为原生机器码，脱离 JIT 运行时，并自动开启全代码裁剪（Full Trimming） -->
     <PublishAot>true</PublishAot>
-    <!-- 剥离调试符号：Release 发布时剥离二进制文件中的调试符号（PDB），进一步缩小最终的可执行文件体积 -->
+
+    <!-- 剥离调试符号：发布时剥离 Linux/macOS 原生二进制内部的符号表（Windows 符号默认已分离至外部 PDB，不受此项影响） -->
     <StripSymbols>true</StripSymbols>
-    <!-- 禁用全球化库：移除 ICU 语言数据库依赖。仅使用 UTC/Invariant 规则，可直接节省 20MB~30MB 镜像体积与内存 -->
-    <InvariantGlobalization>true</InvariantGlobalization>
-    <!-- 允许 Unsafe 代码块：开启对指针和直接内存操作的支持（高性能场景按需启用，默认禁用） -->
+
+    <!-- 编译目标：控制台命令行应用 / Web 极简服务入口 -->
+    <OutputType>Exe</OutputType>
+    <!-- 桌面 GUI 入口类型：WinExe（开发 Avalonia 等桌面应用时替换上方 Exe，消除 Windows 启动时的黑框） -->
+    <!-- <OutputType>WinExe</OutputType> -->
+
+    <!-- 开启编译期绑定：开发 Avalonia 桌面应用走 Native AOT 时的必开项（避免反射丢失导致运行时闪退） -->
+    <!-- <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault> -->
+
+    <!-- 禁用全球化库：移除 ICU 语言数据库依赖。仅使用 UTC/Invariant 规则，可直接节省 20MB~30MB 镜像体积与内存（编写前后端分离、全由前端处理本地化的纯后台 API 时开启；多语言客户端坚决不能开） -->
+    <!-- <InvariantGlobalization>true</InvariantGlobalization> -->
+
+    <!-- 允许 Unsafe 代码块：开启对指针和直接内存操作的支持（高性能计算/互操作场景按需启用，默认禁用） -->
     <!-- <AllowUnsafeBlocks>true</AllowUnsafeBlocks> -->
   </PropertyGroup>
 </Project>
