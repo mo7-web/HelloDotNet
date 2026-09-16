@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <!-- 运行环境：指定目标框架为 .NET 10.0 -->
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- 可空引用类型：开启编译器空值检查（在编译阶段捕获潜在的 NullReferenceException） -->
+    <Nullable>enable</Nullable>
+
+    <!-- 启警告即错误 -->
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+
+    <!-- Native AOT 编译：直接编译为原生机器码，脱离 JIT 运行时，并自动开启全代码裁剪（Full Trimming） -->
+    <PublishAot>true</PublishAot>
+
+    <!-- 向编译器及下游使用者声明“本类库保证完全支持 Native AOT” -->
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+</Project>
+<!-- 类库项目（如 src/MyLib/MyLib.csproj）： -->

@@ -4,7 +4,8 @@
   "explorer.fileNesting.patterns": {
     ".gitignore": ".gitattributes, .gitmodules, .stignore, .nomedia",
     "README.md": "*.md",
-    "package.json": ".editorconfig, *.json, *.yaml, *.yml, *.toml, .env, *config.ts, eslint*, .prettier*"
+    "package.json": "*.json, *.yaml, *.yml, *.toml, .env, *config.ts, eslint*, .prettier*",
+    "*.slnx": "Directory.Build.props, .editorconfig"
   },
 
   // 隐藏文件和目录
