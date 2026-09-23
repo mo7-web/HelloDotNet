@@ -34,6 +34,18 @@ public sealed class CalculatorTests
         Console.WriteLine("测试,HelloTest22");
 
     }
+
+    // dotnet run --project tests/MyApp.Tests -- --output Detailed --no-progress --treenode-filter "/*/*/*/Test_Program_GetGreeting"
+    [TestMethod]
+    public void Test_Program_GetGreeting()
+    {
+        // 1. 准备输入与期望
+        var name = ".NET 10";
+
+        // 2. 调用 Program.cs 里的函数
+        var actual = MyApp.Program.GetGreeting(name);
+
+    }
 }
 
 
