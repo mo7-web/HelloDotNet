@@ -3,4 +3,7 @@
   <Project Path="MiniOrderEngine/MiniOrderEngine.csproj" />
   <Project Path="MyApp/MyApp.csproj" />
   <Project Path="NameSpaceDemo/NameSpaceDemo.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/MyApp.Tests/MyApp.Tests.csproj" />
+  </Folder>
 </Solution>

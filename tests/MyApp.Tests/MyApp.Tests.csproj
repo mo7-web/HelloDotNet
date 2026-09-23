@@ -3,7 +3,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- MSTest.Sdk 默认自动将 OutputType 设为 Exe，并启用 MTP 运行时 -->
+    <!-- 显式确保启用 MTP 原生运行器与 Exe 输出 -->
+    <OutputType>Exe</OutputType>
+    <EnableMSTestRunner>true</EnableMSTestRunner>
   </PropertyGroup>
 
   <ItemGroup>

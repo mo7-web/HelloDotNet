@@ -1,7 +1,13 @@
 namespace MyApp;
 
-public class Calculator
+class Program
 {
-    public int Add(int a, int b) => a + b;
-    public int Divide(int a, int b) => b == 0 ? throw new DivideByZeroException() : a / b;
+    static void Main(string[] args)
+    {
+        //...
+        Console.WriteLine("这里是，MyApp");
+    }
 }
+
+
+
