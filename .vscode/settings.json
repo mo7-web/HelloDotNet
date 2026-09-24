@@ -5,7 +5,7 @@
     ".gitignore": ".gitattributes, .gitmodules, .stignore, .nomedia",
     "README.md": "*.md",
     "package.json": "*.json, *.yaml, *.yml, *.toml, .env, *config.ts, eslint*, .prettier*",
-    "*.slnx": "Directory.Build.props, .editorconfig"
+    "*.slnx": "*.props, .editorconfig"
   },
 
   // 隐藏文件和目录
