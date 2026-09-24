@@ -1,0 +1,15 @@
+<Project Sdk="MSTest.Sdk/3.8.0">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!-- 激活与 dotnet test 命令的原生桥接 -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <!-- 日常开发走快速 JIT，指定参数时才启用 Native AOT 编译严苛校验 -->
+    <PublishAot Condition="'$(AotTest)' == 'true'">true</PublishAot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 引用待测试的 Core 核心类库 -->
+    <ProjectReference Include="..\..\src\MyDemo.Core\MyDemo.Core.csproj" />
+  </ItemGroup>
+</Project>
