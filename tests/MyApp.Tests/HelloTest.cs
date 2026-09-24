@@ -1,6 +1,5 @@
 namespace MyApp.Tests;
 
-
 /*
 dotnet clean tests/MyApp.Tests
 
@@ -37,7 +36,7 @@ public sealed class CalculatorTests
 
     // dotnet run --project tests/MyApp.Tests -- --output Detailed --no-progress --treenode-filter "/*/*/*/Test_Program_GetGreeting"
     [TestMethod]
-    public void Test_Program_GetGreeting()
+    public void TestProgramGetGreeting()
     {
         // 1. 准备输入与期望
         var name = ".NET 10";
@@ -47,5 +46,4 @@ public sealed class CalculatorTests
 
     }
 }
-
 
