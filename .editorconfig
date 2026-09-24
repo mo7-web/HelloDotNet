@@ -4,12 +4,12 @@ root=true
 [*]
 charset=utf-8
 end_of_line=lf
-insert_final_newline=true
-trim_trailing_whitespace=true
 indent_style=space
 indent_size=2
-
+insert_final_newline=true
+trim_trailing_whitespace=true
 # ================= C# 专属自动化修复规则 =================
+
 [*.cs]
 # 仅保留这一行覆盖缩进尺寸（indent_style 自动继承上级 space）
 indent_size=4
@@ -20,9 +20,6 @@ csharp_style_namespace_declarations=file_scoped:warning
 
 # 强制要求 if/else/for 必须补全大括号（保存时自动加上 { }）
 csharp_prefer_braces=true:warning
-
-# 保存时自动删除没用到的 using 引用（IDE0005）
-dotnet_diagnostic.IDE0005.severity=warning
 
 # --- 空行压制自动化（必须为 warning 才会触发保存时自动删除多余空行） ---
 # 禁止类/结构体开头留空行

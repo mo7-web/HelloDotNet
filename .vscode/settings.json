@@ -21,7 +21,8 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
   },
 
   // C# 相关设置
