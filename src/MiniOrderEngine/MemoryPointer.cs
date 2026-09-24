@@ -1,18 +1,20 @@
+using System.Globalization;
+
 namespace MemoryPointer;
 
 public struct BadParse
 {
     // 从网络接收到一段行情文本数据："BTCUSDT,65432.10,1500"（交易对、价格、数量）。
     // 每一帧都会产生巨额 GC 垃圾的传统写法：
-    public void Parse(string rawData)
+    public static void Parse(string rawData)
     {
         // 灾难 1：Split 会在堆上分配一个 string[] 数组
         // 灾难 2：Split 还会为切分出来的 3 个子片段在堆上分配 3 个全新的 string 对象！
         string[] parts = rawData.Split(',');
 
         string symbol = parts[0];
-        decimal price = decimal.Parse(parts[1]);
-        int volume = int.Parse(parts[2]);
+        decimal price = decimal.Parse(parts[1], CultureInfo.InvariantCulture);
+        int volume = int.Parse(parts[2], CultureInfo.InvariantCulture);
         // 哪怕后续啥都不干，这一次解析就已经在堆上丢弃了 4 个垃圾对象！
     }
 }

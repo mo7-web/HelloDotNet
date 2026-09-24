@@ -17,7 +17,7 @@ public enum OrderSide : byte
 // 对应 Go： 1<<0,1<<1
 
 [Flags]
-public enum OrderFlags : byte
+public enum OrderOptions : byte
 {
     None = 0,
     MakerOnly = 1 << 0, // 0001: 只做挂单
@@ -30,9 +30,9 @@ public enum OrderFlags : byte
 
 public struct MarketTick
 {
-    public long Timestamp;
-    public decimal Price; // 使用 高精度十进制数
-    public double UnsafePrice; // 故意引入 IEEE 浮点数用于对比
+    public long Timestamp { get; set; }
+    public decimal Price { get; set; } // 使用 高精度十进制数
+    public double UnsafePrice { get; set; } // 故意引入 IEEE 浮点数用于对比
 
     public MarketTick(long ts, decimal p, double up)
     {
@@ -46,8 +46,8 @@ public struct MarketTick
 // 类似于 Go 中的 *Account 语义
 public class Account
 {
-    public string AccountId; // 非空保证
-    public decimal Balance; // 账户余额
+    public string AccountId { get; set; }  // 非空保证
+    public decimal Balance { get; set; }  // 账户余额
 
     public Account(string accountId, decimal initialBalance)
     {
@@ -72,5 +72,6 @@ public class AuditLogScope : IDisposable
     public void Dispose()
     {
         Console.WriteLine($"[审计结束] 安全退出操作域: {_scopeName}");
+        GC.SuppressFinalize(this);
     }
 }

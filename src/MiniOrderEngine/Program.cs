@@ -59,10 +59,10 @@ class Program
         Console.WriteLine("--- 实验 3：位掩码枚举与模式匹配 ---");
 
         // 组合权限：同时指定为 MakerOnly 和 IsPostOnly（按位或 |）
-        OrderFlags flags = OrderFlags.MakerOnly | OrderFlags.IsPostOnly;
+        OrderOptions flags = OrderOptions.MakerOnly | OrderOptions.IsPostOnly;
 
         // 检查是否包含 MakerOnly 权限
-        bool isMaker = flags.HasFlag(OrderFlags.MakerOnly);
+        bool isMaker = flags.HasFlag(OrderOptions.MakerOnly);
         Console.WriteLine($"当前订单属性是否为 MakerOnly? {isMaker}");
 
         // 现代 switch 表达式：根据买卖方向输出描述
