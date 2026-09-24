@@ -5,6 +5,7 @@ publish/
 *.user
 *.suo
 TestResults/
+artifacts/
 
 # 4. 前端与脚本环境 (Vue 3 / Vite / Node)
 node_modules/
