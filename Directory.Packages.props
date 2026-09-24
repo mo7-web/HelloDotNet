@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <!-- 显式开启集中式包管理 -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 </Project>
