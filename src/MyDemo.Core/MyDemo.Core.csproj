@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- 约束该类库遵守 AOT 剪裁规范 -->
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+</Project>

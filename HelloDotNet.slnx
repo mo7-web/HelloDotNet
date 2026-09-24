@@ -3,6 +3,8 @@
     <Project Path="src/HelloWorld/HelloWorld.csproj" />
     <Project Path="src/MiniOrderEngine/MiniOrderEngine.csproj" />
     <Project Path="src/MyApp/MyApp.csproj" />
+    <Project Path="src/MyDemo.Cli/MyDemo.Cli.csproj" />
+    <Project Path="src/MyDemo.Core/MyDemo.Core.csproj" />
     <Project Path="src/NameSpaceDemo/NameSpaceDemo.csproj" />
   </Folder>
   <Folder Name="/tests/">

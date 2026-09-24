@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- 声明该工程是可执行二进制，非类库 -->
+    <OutputType>Exe</OutputType>
+    <PublishAot>true</PublishAot>
+  </PropertyGroup>
+
+  <!-- 核心：通过相对路径引用 MyDemo.Core 类库 -->
+  <ItemGroup>
+    <ProjectReference Include="../MyDemo.Core/MyDemo.Core.csproj" />
+  </ItemGroup>
+</Project>
