@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-/* 
+/*
 真正跨平台的 Git 自动提交脚本
 基于 execa 驱动，零 Shell 依赖，Windows/macOS/Linux 完全通用
 */
