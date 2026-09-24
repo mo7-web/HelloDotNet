@@ -8,7 +8,6 @@ public class Program
         Console.WriteLine("这里是，MyApp");
     }
 
-
     // 1. 必须声明为 public，允许外部项目引用
     public static string GetGreeting(string name)
     {
@@ -18,6 +17,3 @@ public class Program
         return $"你好，{name}！";
     }
 }
-
-
-

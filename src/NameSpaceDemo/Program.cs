@@ -25,7 +25,7 @@ namespace NameSpace1
             await Task.Delay(1000);
 
             var ppppp = new YourNamespace3.Program(); // 非 static 方法需要 new 一下
-            ppppp.MyFunc();
+            YourNamespace3.Program.MyFunc();
 
             await Task.Delay(1000);
 
@@ -58,7 +58,7 @@ namespace YourNamespace3
 {
     class Program
     {
-        public void MyFunc()
+        public static void MyFunc()
         {
             Console.WriteLine("Hello, YourNamespace3");
         }
