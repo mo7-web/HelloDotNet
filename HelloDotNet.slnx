@@ -1,8 +1,10 @@
 <Solution>
-  <Project Path="HelloWorld/HelloWorld.csproj" />
-  <Project Path="MiniOrderEngine/MiniOrderEngine.csproj" />
-  <Project Path="MyApp/MyApp.csproj" />
-  <Project Path="NameSpaceDemo/NameSpaceDemo.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/HelloWorld/HelloWorld.csproj" />
+    <Project Path="src/MiniOrderEngine/MiniOrderEngine.csproj" />
+    <Project Path="src/MyApp/MyApp.csproj" />
+    <Project Path="src/NameSpaceDemo/NameSpaceDemo.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MyApp.Tests/MyApp.Tests.csproj" />
   </Folder>

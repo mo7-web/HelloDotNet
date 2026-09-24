@@ -1,19 +1,28 @@
 <Project>
   <PropertyGroup>
-    <!-- 运行环境：指定目标框架为 .NET 10.0 -->
+    <!-- 全局统一运行时与语言基线 -->
     <TargetFramework>net10.0</TargetFramework>
-
-    <!-- 可空引用类型：开启编译器空值检查（在编译阶段捕获潜在的 NullReferenceException） -->
+    <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
 
-    <!-- 启警告即错误 -->
-    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+    <!-- 禁用 SDK 隐式导入，各项目必须显式维护各自的 GlobalUsings.cs -->
+    <ImplicitUsings>disable</ImplicitUsings>
 
-    <!-- Native AOT 编译：直接编译为原生机器码，脱离 JIT 运行时，并自动开启全代码裁剪（Full Trimming） -->
-    <PublishAot>true</PublishAot>
+    <!-- 零容忍分析策略：警告即错误，拦截一切反射与裁剪漏洞 -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-    <!-- 向编译器及下游使用者声明“本类库保证完全支持 Native AOT” -->
-    <IsAotCompatible>true</IsAotCompatible>
+    <!-- 启用现代产物拓扑收敛：产物直接输出至根目录 /artifacts -->
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+
+    <!-- AOT 产物体积优化：剥离调试符号，启用体积优先优化 -->
+    <StripSymbols>true</StripSymbols>
+    <OptimizationPreference>Size</OptimizationPreference>
+
+    <!-- 确定性元数据保证增量编译哈希命中 -->
+    <Authors>墨七 (mo7cc@outlook.com)</Authors>
+    <Company>陕西墨七数字科技有限公司</Company>
+    <Copyright>Copyright © 2026 陕西墨七数字科技有限公司. All rights reserved.</Copyright>
   </PropertyGroup>
 </Project>
-<!-- 类库项目（如 src/MyLib/MyLib.csproj）： -->
