@@ -80,14 +80,25 @@ public static class ModelingDemo
         DemonstrateStructVsClass();
     }
 
+    public static void Execute<T>(T runner) where T : IRunner
+    {
+        // 内部可以安全调用 IRunner 接口定义的 Run()
+        string result = runner.Run();
+        Console.WriteLine($"执行结果: {result}");
+    }
+
     private static void DemonstrateClassAndInit()
     {
+
         // 1. 具体类型实例化与属性校验
         var client = new NetworkClient("https://api.internal:8443", 5000)
         {
             AuthToken = "Bearer sk_sec_9999",
             EnableCompression = false
         };
+
+        // 隐式类型推导（推荐！编译器会自动推导 T 为 NetworkClient）
+        Execute(client);
 
         /*
         相当于:
