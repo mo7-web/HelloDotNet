@@ -52,27 +52,30 @@ public static class AdvancedConcurrencyDemo
     }
 
     // 纯声明式 switch 表达式：返回值驱动，告别老旧的 break 语句
-    private static string EvaluateOrder(PaymentOrder order) => order switch
+    private static string EvaluateOrder(PaymentOrder order)
     {
-        // 场景 A：现金单，且金额 > 100 (关系模式)
-        CashOrder { Amount: > 100m } cash =>
-            $"[Cash Verified] High-value cash: {cash.Amount.ToString(CultureInfo.InvariantCulture)}",
+        return order switch
+        {
+            // 场景 A：现金单，且金额 > 100 (关系模式)
+            CashOrder { Amount: > 100m } cash =>
+                $"[Cash Verified] High-value cash: {cash.Amount.ToString(CultureInfo.InvariantCulture)}",
 
-        // 场景 B：信用卡，嵌套属性模式匹配：风控分 > 80 直接阻断
-        CreditCardOrder { RiskScore: > 80, CardNumber: var card } =>
-            $"[Card Blocked] Fraud risk detected on card: {card}",
+            // 场景 B：信用卡，嵌套属性模式匹配：风控分 > 80 直接阻断
+            CreditCardOrder { RiskScore: > 80, CardNumber: var card } =>
+                $"[Card Blocked] Fraud risk detected on card: {card}",
 
-        // 场景 C：信用卡普通放行
-        CreditCardOrder card =>
-            $"[Card Accepted] Normal transaction: {card.Amount.ToString(CultureInfo.InvariantCulture)}",
+            // 场景 C：信用卡普通放行
+            CreditCardOrder card =>
+                $"[Card Accepted] Normal transaction: {card.Amount.ToString(CultureInfo.InvariantCulture)}",
 
-        // 场景 D：加密货币指定链匹配
-        CryptoOrder { Chain: "Ethereum" or "Solana" } crypto =>
-            $"[Crypto Pass] Mainstream chain supported: {crypto.Chain}, Amount: {crypto.UsdtAmount.ToString(CultureInfo.InvariantCulture)}",
+            // 场景 D：加密货币指定链匹配
+            CryptoOrder { Chain: "Ethereum" or "Solana" } crypto =>
+                $"[Crypto Pass] Mainstream chain supported: {crypto.Chain}, Amount: {crypto.UsdtAmount.ToString(CultureInfo.InvariantCulture)}",
 
-        // 弃元模式（对标 Go 的 _ 与 TS default）
-        _ => "[Order Rejected] Unsupported payment structure"
-    };
+            // 弃元模式（对标 Go 的 _ 与 TS default）
+            _ => "[Order Rejected] Unsupported payment structure"
+        };
+    }
 
     // ==========================================
     // 5.2 异步编程 (Task / ValueTask / CancellationToken)
@@ -85,7 +88,7 @@ public static class AdvancedConcurrencyDemo
 
         // 2. 协同取消机制实战 (对标 Go 的 context.WithTimeout)
         // [Go: ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)]
-        using var cts = new CancellationTokenSource(delay: TimeSpan.FromMilliseconds(200));
+        using var cts = new CancellationTokenSource(delay: TimeSpan.FromMilliseconds(500));
 
         try
         {
