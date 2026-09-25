@@ -12,11 +12,12 @@ void HelloWorld()
     Console.WriteLine("Hello," + name2 + "! ");
 
     // 1.1 ~ 1.3 基础
-    BasicsDemo.Run();
+    // BasicsDemo.Run();
 
     // 调用 1.4 ~ 1.5
     ControlFlowDemo.Run();
 
+    Console.WriteLine(">>> 全流程执行完毕 <<<");
 }
 
 HelloWorld();

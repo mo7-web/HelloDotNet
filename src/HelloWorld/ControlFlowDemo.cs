@@ -69,6 +69,7 @@ public static class ControlFlowDemo
         {
             try
             {
+                Console.WriteLine($"当前处理: {payload}");
                 ProcessPayload(payload);
             }
             // 条件捕获：仅捕获 InvalidOperationException 且 Message 包含 "timeout" 的异常
@@ -92,6 +93,7 @@ public static class ControlFlowDemo
         // 场景 2：Native AOT 高性能标准模式：TryXxx（消除异常惩罚）
         // [类比 Go: val, ok := parse("123")]
         string inputStr = "999";
+        // 尝试把字符串转换为 32 位整型。如果成功返回 true 并将解析后的数值塞入 parsedVal；如果失败返回 false，不抛出任何异常。
         if (int.TryParse(inputStr, out int parsedVal))
         {
             Console.WriteLine($"[推荐的高性能模式] 显式转换成功，无异常抛出开销: {parsedVal}");
