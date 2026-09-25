@@ -1,4 +1,4 @@
-namespace HelloWorld.Basics;
+namespace MyDemo.Basics;
 
 public class BasicsDemo
 {

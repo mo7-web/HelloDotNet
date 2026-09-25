@@ -2,9 +2,9 @@
 // 集中管理当前项目的所有全局命名空间
 
 global using System;
-// global using System.Collections.Generic;
+global using System.Collections.Generic;
 // global using System.IO;
-// global using System.Linq;
+global using System.Linq;
 // global using System.Net.Http;
 // global using System.Threading;
 // global using System.Threading.Tasks;

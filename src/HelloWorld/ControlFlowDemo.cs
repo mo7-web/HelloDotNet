@@ -1,4 +1,4 @@
-namespace HelloWorld.ControlFlow;
+namespace MyDemo.ControlFlow;
 
 public static class ControlFlowDemo
 {

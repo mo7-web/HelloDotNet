@@ -1,6 +1,7 @@
-using HelloWorld.Basics;
-using HelloWorld.ControlFlow;
+using MyDemo.Basics;
+using MyDemo.ControlFlow;
 using MyDemo.FunctionsAndNullability;
+using MyDemo.Collections;
 
 void HelloWorld()
 {
@@ -20,6 +21,9 @@ void HelloWorld()
 
     // 第二阶段  2.1~2.3
     FunctionsDemo.Run();
+
+    // 第三阶段：数据容器与切片
+    CollectionsDemo.Run();
 
     Console.WriteLine(">>> 全流程执行完毕 <<<");
 }
