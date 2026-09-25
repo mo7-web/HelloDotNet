@@ -1,3 +1,5 @@
+namespace HelloWorld;
+
 using MyDemo.Basics;
 using MyDemo.ControlFlow;
 using MyDemo.FunctionsAndNullability;
@@ -5,9 +7,9 @@ using MyDemo.Collections;
 using MyDemo.Modeling;
 using MyDemo.Advanced;
 
-internal class Program
+public class Program
 {
-    private static void Main(string[] args)
+    static void Main(string[] args)
     {
         async void HelloWorld()
         {
