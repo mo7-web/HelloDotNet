@@ -22,11 +22,11 @@ pnpm-lock.yaml
 # 4. IDE 核心工作区缓存
 .vs/
 .idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/tasks.json
-!.vscode/launch.json
+# .vscode/*
+# !.vscode/settings.json
+# !.vscode/extensions.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
 
 # 5. 操作系统缓存
 .DS_Store
