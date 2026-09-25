@@ -26,8 +26,10 @@ public class NetworkClient(string endpoint, int timeoutMs) : IRunner
     public bool EnableCompression { get; set; } = true;
 
     // 显式实现接口方法
-    public string Run() =>
-        $"[Client] Connected to {endpoint} (Timeout: {timeoutMs.ToString(CultureInfo.InvariantCulture)}ms, Token: {AuthToken})";
+    public string Run()
+    {
+        return $"[Client] Connected to {endpoint} (Timeout: {timeoutMs.ToString(CultureInfo.InvariantCulture)}ms, Token: {AuthToken})";
+    }
 }
 
 // ==========================================
@@ -48,7 +50,10 @@ public readonly struct Point(int x, int y)
     public int Y { get; } = y;
 
     // 结构体表达式主体方法
-    public Point Translate(int dx, int dy) => new(X + dx, Y + dy);
+    public Point Translate(int dx, int dy)
+    {
+        return new(X + dx, Y + dy);
+    }
 }
 
 // 可变结构体（反面教材演示：用于验证值传递深拷贝）
@@ -84,10 +89,21 @@ public static class ModelingDemo
             EnableCompression = false
         };
 
-        // client.AuthToken = "change"; // 编译错误！init 属性仅在构建阶段允许赋值
+        /*
+        相当于:
+            // 编译器自动生成的底层逻辑：
+            NetworkClient temp = new NetworkClient("https://api.internal:8443", 5000); // 1. 先跑构造函数
+            temp.AuthToken = "Bearer sk_sec_9999";  // 2. 依次给属性赋值 但因为  AuthToken ( get; init; ) 只能在构建阶段赋值 所以会报错。
+            temp.EnableCompression = false;                                          // 3. 依次给属性赋值
+            var client = temp;  // 4. 最后才把完整对象交给你
 
-        IRunner runner = client; // 向上转型为接口契约
-        Console.WriteLine(runner.Run());
+
+        */
+
+        // 2. 本地直接调用具体类型：触发编译器去虚拟化与内联，享受极限性能
+        Console.WriteLine($"[Concrete Direct Call] {client.Run()}");
+
+        // client.AuthToken = "change"; // 编译错误！init 属性仅在构建阶段允许赋值
     }
 
     private static void DemonstrateRecords()
