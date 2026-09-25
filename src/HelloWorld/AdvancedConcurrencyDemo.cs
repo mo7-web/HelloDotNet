@@ -83,7 +83,7 @@ public static class AdvancedConcurrencyDemo
     private static async Task DemonstrateAsyncAndCancellationAsync()
     {
         // 1. ValueTask 性能演示：如果结果已经同步就绪，绝对零堆分配 (Native AOT 核心基石)
-        int cachedVal = await FetchDataWithCacheAsync(cacheHit: true);
+        int cachedVal = await FetchDataWithCacheAsync(cacheHit: false);
         Console.WriteLine($"ValueTask Cache Hit: {cachedVal.ToString(CultureInfo.InvariantCulture)}");
 
         // 2. 协同取消机制实战 (对标 Go 的 context.WithTimeout)
@@ -137,7 +137,7 @@ public static class AdvancedConcurrencyDemo
         // 慢速路径 (Slow Path)：走真实异步状态机
         return new ValueTask<int>(Task.Run(async () =>
         {
-            await Task.Delay(50);
+            await Task.Delay(1000);
             return 100;
         }));
     }
