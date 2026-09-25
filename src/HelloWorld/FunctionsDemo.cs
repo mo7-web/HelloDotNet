@@ -33,7 +33,10 @@ public static class FunctionsDemo
         return a + b;
     }
 
-    private static int Multiply(int a, int b) => a * b;
+    private static int Multiply(int a, int b)
+    {
+        return a * b;
+    }
 
     private static void DemonstrateFunctions()
     {
@@ -99,6 +102,9 @@ public static class FunctionsDemo
 
         // 核心修复行：显式传递 CultureInfo.InvariantCulture 消除 CA1305 告警/错误
         int? length = nullableStr?.Length;
+
+        Console.WriteLine($"Nullable length1: {length}");
+
         string lengthDisplay = length?.ToString(CultureInfo.InvariantCulture) ?? "NULL_RESULT";
         Console.WriteLine($"Nullable Length: {lengthDisplay}");
 
