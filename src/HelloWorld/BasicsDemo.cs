@@ -1,66 +1,18 @@
-namespace BasicsDemo;
+namespace HelloWorld.Basics;
 
-public class Program
+public class BasicsDemo
 {
-    public static void NumberDemo()
-    {
-        int population = 67_000_000;
-        long distance = 384_400_000L;
-        short temperature = -40;
-        byte red = 255;
-
-        double pi = 3.141592653589793;
-        float gravity = 9.81f;
-        decimal price = 19.99m;
-        Console.WriteLine(
-          $"""
-    population  {population}
-    distance    {distance}
-    temperature {temperature}
-    red         {red}
-    pi          {pi}
-    gravity     {gravity}
-    price       {price}
-    """
-        );
-    }
-
-    public static void StringDemo()
-    {
-        char newline = '\n';
-        char unicode = '\u0041'; // 'A'
-
-        var greeting = "Hello, World!";
-        var dec = 42;
-
-        string message = $"Found {dec} items"; // interpolated string
-        string path = @"C:\Users\docs\file.txt"; // verbatim string
-        string json = """
-    { "name": "Alice", "age": 30 }
-    """; // raw string literal
-        string raw = $"""
-    Found {dec} items in "{greeting}"
-    """; // raw + interpolated
-
-        Console.WriteLine(
-          $"""
-    newline  {newline}
-    unicode  {unicode}
-    greeting {greeting}
-    dec      {dec}
-    message  {message}
-    path     {path}
-    json     {json}
-    raw      {raw}
-    """
-        );
-    }
 
     public static void Run()
     {
         // ==========================================
         // 1.1 基础数值类型与字面量后缀
         // ==========================================
+
+        Console.WriteLine("=== [1.1~1.3 基元与字符串演练] ===");
+
+        NumberDemo();
+        StringDemo();
 
         // 整型家族
         int standardInt = 42;                 // [Go: int32] / [JS: number] 默认32位有符号整型
@@ -140,6 +92,60 @@ public class Program
         // ==========================================
         Console.WriteLine($"[原始多行 JSON]\n{jsonPayload}");
         Console.WriteLine($"[UTF-8 字节切片长度] Length: {utf8Ping.Length}");
+    }
+
+    private static void NumberDemo()
+    {
+        int population = 67_000_000;
+        long distance = 384_400_000L;
+        short temperature = -40;
+        byte red = 255;
+
+        double pi = 3.141592653589793;
+        float gravity = 9.81f;
+        decimal price = 19.99m;
+        Console.WriteLine(
+          $"""
+    population  {population}
+    distance    {distance}
+    temperature {temperature}
+    red         {red}
+    pi          {pi}
+    gravity     {gravity}
+    price       {price}
+    """
+        );
+    }
+
+    private static void StringDemo()
+    {
+        char newline = '\n';
+        char unicode = '\u0041'; // 'A'
+
+        var greeting = "Hello, World!";
+        var dec = 42;
+
+        string message = $"Found {dec} items"; // interpolated string
+        string path = @"C:\Users\docs\file.txt"; // verbatim string
+        string json = """
+    { "name": "Alice", "age": 30 }
+    """; // raw string literal
+        string raw = $"""
+    Found {dec} items in "{greeting}"
+    """; // raw + interpolated
+
+        Console.WriteLine(
+          $"""
+    newline  {newline}
+    unicode  {unicode}
+    greeting {greeting}
+    dec      {dec}
+    message  {message}
+    path     {path}
+    json     {json}
+    raw      {raw}
+    """
+        );
     }
 
 }

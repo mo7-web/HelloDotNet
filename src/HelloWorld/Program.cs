@@ -1,3 +1,6 @@
+using HelloWorld.Basics;
+using HelloWorld.ControlFlow;
+
 void HelloWorld()
 {
     var now = DateTime.Now;
@@ -8,10 +11,11 @@ void HelloWorld()
     name2 = name2 + "3";
     Console.WriteLine("Hello," + name2 + "! ");
 
-    BasicsDemo.Program.NumberDemo();
-    BasicsDemo.Program.StringDemo();
     // 1.1 ~ 1.3 基础
-    BasicsDemo.Program.Run();
+    BasicsDemo.Run();
+
+    // 调用 1.4 ~ 1.5
+    ControlFlowDemo.Run();
 
 }
 
