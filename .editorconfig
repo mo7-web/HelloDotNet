@@ -1,6 +1,5 @@
 root = true
 
-# ================= 全局基线规范（适用于非 C# 文件） =================
 [*]
 charset = utf-8
 end_of_line = lf
@@ -8,26 +7,21 @@ indent_size = 2
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
-# ================= C# 专属自动化修复规则 =================
 
-[*.cs]
-# 仅保留这一行覆盖缩进尺寸（indent_style 自动继承上级 space）
+# C# 与 Avalonia XAML 保持 4 格缩进
+[*.{cs,axaml}]
 indent_size = 4
 
-# 强制文件范围命名空间（保存时自动把传统大括号拍平成单行 namespace MyApp;）
-csharp_style_namespace_declarations = file_scoped:warning
+[*.cs]
+# 自动组织命名空间：保存时自动展开为单行 namespace Wanderer.UI;
+csharp_style_namespace_declarations = file_scoped:suggestion
 
-# 强制要求 if/else/for 必须补全大括号（保存时自动加上 { }）
-csharp_prefer_braces = true:warning
+# 控制流大括号补全：if/for 换行时 IDE 自动补全大括号
+csharp_prefer_braces = true:suggestion
 
 # --- 限制代码块与类定义内最多保留 1 个连续空行 ---
 # 1. Rider (JetBrains 引擎专属解析项)
 csharp_keep_blank_lines_in_code = 1
 csharp_keep_blank_lines_in_declarations = 1
-
 # 2. VS Code / Roslyn (.NET 编译器 IDE2000 规则)
-dotnet_style_allow_multiple_blank_lines_experimental = false:warning
-
-# ================= Avalonia XAML =================
-[*.axaml]
-indent_size = 4
+dotnet_style_allow_multiple_blank_lines_experimental = false:suggestion

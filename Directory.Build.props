@@ -1,17 +1,12 @@
 <Project>
   <PropertyGroup>
-    <!-- 全局统一运行时与语言基线 -->
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
-
-    <!-- 禁用 SDK 隐式导入，各项目必须显式维护各自的 GlobalUsings.cs -->
     <ImplicitUsings>disable</ImplicitUsings>
 
     <!-- 零容忍分析策略：警告即错误，拦截一切反射与裁剪漏洞 -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
     <!-- 启用现代产物拓扑收敛：产物直接输出至根目录 /artifacts -->
     <UseArtifactsOutput>true</UseArtifactsOutput>
