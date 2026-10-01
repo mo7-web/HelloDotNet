@@ -1,99 +1,98 @@
 namespace MyDemo.Advanced;
 
-using System;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
+// ==========================================
+// 1. 数据契约定义（接口契约 + 具名扁平结构体）
+// 映射：对标 Go 的 interface 定义与 struct 实体
+// ==========================================
+
+public interface IPaymentOrder
+{
+    decimal Amount { get; }
+}
+
+public readonly record struct CashOrder(decimal Amount) : IPaymentOrder;
+
+public readonly record struct CreditCardOrder(decimal Amount, string CardNumber, int RiskScore) : IPaymentOrder;
+
+public readonly record struct CryptoOrder(decimal Amount, string Chain) : IPaymentOrder;
 
 // ==========================================
-// 领域契约定义：显式 sealed 便于 AOT 虚方法去虚化
+// 2. 业务演练主类
 // ==========================================
-public abstract record PaymentOrder;
-
-public sealed record CashOrder(decimal Amount) : PaymentOrder;
-
-public sealed record CreditCardOrder(decimal Amount, string CardNumber, int RiskScore) : PaymentOrder;
-
-public sealed record CryptoOrder(decimal UsdtAmount, string Chain) : PaymentOrder;
 
 public static class AdvancedConcurrencyDemo
 {
     public static async Task RunAsync()
     {
-        Console.WriteLine("=== [5.1 扁平类型守卫与模式匹配] ===");
+        Console.WriteLine("=== [5.1 现代模式匹配与卫语句 (Guard Clauses)] ===");
         DemonstratePatternMatching();
 
-        Console.WriteLine("\n=== [5.2 异步并发与协同取消] ===");
+        Console.WriteLine("\n=== [5.2 异步全透明、协同取消与确定性释放] ===");
         await DemonstrateAsyncAndCancellationAsync();
     }
 
     // ==========================================
-    // 5.1 模式匹配：平铺展开，消除 switch 表达式
+    // 5.1 模式匹配扁平化演练
     // ==========================================
     private static void DemonstratePatternMatching()
     {
-        // 允许使用 C# 现代集合表达式 [ ... ]
-        PaymentOrder[] testOrders =
+        // 使用现代集合表达式声明数组契约
+        IPaymentOrder[] testOrders =
         [
             new CashOrder(150.0m),
-            new CreditCardOrder(999.0m, "4111-XXXX-XXXX-1111", 85),
-            new CreditCardOrder(50.0m, "4111-XXXX-XXXX-2222", 10),
+            new CreditCardOrder(999.0m, "4111-XXXX-XXXX-1111", RiskScore: 85),
+            new CreditCardOrder(50.0m, "4111-XXXX-XXXX-2222", RiskScore: 10),
             new CryptoOrder(3000.0m, "Ethereum")
         ];
 
-        foreach (var order in testOrders)
+        foreach (IPaymentOrder order in testOrders)
         {
             string auditResult = EvaluateOrder(order);
             Console.WriteLine(auditResult);
         }
 
+        // 扁平状态获取演示
         int temperature = 25;
         string weatherAlert = GetWeatherAlert(temperature);
         Console.WriteLine($"Weather Status: {weatherAlert}");
     }
 
-    // Go 风格卫语句：消除嵌套，每一步都可精准下断点调试
-    private static string EvaluateOrder(PaymentOrder order)
+    // 严禁 switch 表达式，重构为 Go 风格的扁平卫语句
+    // 断点可单行命中，分支逻辑透明展开
+    private static string EvaluateOrder(IPaymentOrder order)
     {
-        // 场景 A：现金单类型守卫与金额校验
-        if (order is CashOrder cash)
+        // 场景 A：现金单且金额 > 100
+        if (order is CashOrder cash && cash.Amount > 100.0m)
         {
-            if (cash.Amount > 100.0m)
-            {
-                return $"[Cash Verified] High-value cash: {cash.Amount.ToString(CultureInfo.InvariantCulture)}";
-            }
-
-            return $"[Cash Accepted] Standard cash: {cash.Amount.ToString(CultureInfo.InvariantCulture)}";
+            return $"[Cash Verified] High-value cash: {cash.Amount}";
         }
 
-        // 场景 B：信用卡类型守卫与风控校验
-        if (order is CreditCardOrder card)
+        // 场景 B：信用卡风控拦截（嵌套模式属性检查）
+        if (order is CreditCardOrder highRiskCard && highRiskCard.RiskScore > 80)
         {
-            if (card.RiskScore > 80)
-            {
-                return $"[Card Blocked] Fraud risk detected on card: {card.CardNumber}";
-            }
-
-            return $"[Card Accepted] Normal transaction: {card.Amount.ToString(CultureInfo.InvariantCulture)}";
+            return $"[Card Blocked] Fraud risk detected on card: {highRiskCard.CardNumber}";
         }
 
-        // 场景 C：加密货币主网白名单校验
+        // 场景 C：信用卡普通放行
+        if (order is CreditCardOrder normalCard)
+        {
+            return $"[Card Accepted] Normal transaction: {normalCard.Amount}";
+        }
+
+        // 场景 D：指定加密链放行（显式逻辑判断，对标 TS/Go 展开）
         if (order is CryptoOrder crypto)
         {
-            var isSupportedChain = crypto.Chain == "Ethereum" || crypto.Chain == "Solana";
-            if (isSupportedChain)
+            if (crypto.Chain == "Ethereum" || crypto.Chain == "Solana")
             {
-                return $"[Crypto Pass] Mainstream chain supported: {crypto.Chain}, Amount: {crypto.UsdtAmount.ToString(CultureInfo.InvariantCulture)}";
+                return $"[Crypto Pass] Mainstream chain supported: {crypto.Chain}, Amount: {crypto.Amount}";
             }
-
-            return $"[Crypto Rejected] Unsupported chain: {crypto.Chain}";
         }
 
-        // 兜底返回（对标 TS never 或 Go default）
+        // 默认兜底回退（对标 Go switch default 或末尾防御返回）
         return "[Order Rejected] Unsupported payment structure";
     }
 
-    // 扁平化条件分支：杜绝多层三元与 switch 表达式
+    // 简单状态判断消除三元与 switch 表达式，清晰展开
     private static string GetWeatherAlert(int temperature)
     {
         if (temperature < 0)
@@ -110,49 +109,40 @@ public static class AdvancedConcurrencyDemo
     }
 
     // ==========================================
-    // 5.2 异步编程 (Task 与 CancellationToken 显式流)
+    // 5.2 异步编程全透明演示
     // ==========================================
     private static async Task DemonstrateAsyncAndCancellationAsync()
     {
-        int cachedVal = await FetchDataWithCacheAsync(cacheHit: true);
-        Console.WriteLine($"Cache Result: {cachedVal.ToString(CultureInfo.InvariantCulture)}");
+        // 1. 异步数据获取（统一 Task，全程显式 await）
+        int cachedVal = await FetchDataWithCacheAsync(cacheHit: false);
+        Console.WriteLine($"Async Fetch Result: {cachedVal}");
 
-        // 强制使用显式大括号 using 块，明确资源存续边界
-        using (var cts = new CancellationTokenSource(delay: TimeSpan.FromMilliseconds(500)))
+        // 2. 协同取消机制实战（对标 Go 的 context.WithTimeout）
+        // 强制使用带大括号的显式 using 块，杜绝 using var 造成的延迟析构
+        using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500)))
         {
             try
             {
                 Console.WriteLine("[Async Task] Starting heavy network stream simulation...");
 
-                // 将 cts.Token 显式透传，对应 Go 的 ctx
+                // 级联透传 CancellationToken（对标 Go 透传 ctx）
                 await ProcessNetworkStreamAsync(cts.Token);
 
                 Console.WriteLine("[Async Task] Completed successfully.");
             }
             catch (OperationCanceledException)
             {
-                // 捕获取消信号，对应 Go 的 select { case <-ctx.Done(): }
+                // 拦截超时取消信号（对标 Go select case <-ctx.Done():）
                 Console.WriteLine("[Async Cancelled] Worker gracefully stopped via CancellationToken timeout!");
             }
         }
 
-        // 静态本地函数：杜绝闭包捕获，保证 0 堆分配
-        static int ComputeFastChecksum(ReadOnlySpan<byte> bytes)
-        {
-            var checksum = 0;
-            foreach (var b in bytes)
-            {
-                checksum ^= b;
-            }
-
-            return checksum;
-        }
-
-        var hash = ComputeFastChecksum("PAYLOAD"u8);
-        Console.WriteLine($"Local Static Function Checksum: {hash.ToString(CultureInfo.InvariantCulture)}");
+        // 3. 静态本地逻辑提炼为显式静态方法，避免闭包与委托隐式分配
+        int hash = ComputeFastChecksum("PAYLOAD"u8);
+        Console.WriteLine($"Static Function Checksum: {hash}");
     }
 
-    // 异步全透明：统一返回 Task，不搞过度优化的复杂状态机包装
+    // 异步全透明：统一返回 Task<T> 并显式 await，杜绝 ValueTask 复杂陷阱
     private static async Task<int> FetchDataWithCacheAsync(bool cacheHit)
     {
         if (cacheHit)
@@ -160,21 +150,37 @@ public static class AdvancedConcurrencyDemo
             return 42;
         }
 
-        await Task.Delay(100);
+        // 模拟真实 I/O 慢速路径，全链路透明传递
+        await Task.Delay(1000);
         return 100;
     }
 
-    // 标准 CancellationToken 协作式取消工作流
-    private static async Task ProcessNetworkStreamAsync(CancellationToken ct)
+    // 接受 CancellationToken 级联透传的异步工作负载
+    // 映射：Go 的 func ProcessNetworkStream(ctx context.Context) error
+    private static async Task ProcessNetworkStreamAsync(CancellationToken cancellationToken)
     {
-        for (var i = 1; i <= 10; i++)
+        for (int i = 1; i <= 10; i++)
         {
-            // 显式检查取消标记
-            ct.ThrowIfCancellationRequested();
+            // 核心检测点：抛出 OperationCanceledException
+            // 映射：Go 的 if err := ctx.Err(); err != nil { return err }
+            cancellationToken.ThrowIfCancellationRequested();
 
-            Console.WriteLine($"Processing chunk {i.ToString(CultureInfo.InvariantCulture)}/10...");
+            Console.WriteLine($"Processing chunk {i}/10...");
 
-            await Task.Delay(100, ct);
+            // Task.Delay 接收取消令牌，收到取消信号时立刻中断唤醒
+            await Task.Delay(100, cancellationToken);
         }
+    }
+
+    // 高吞吐基础算法：静态方法杜绝闭包分配，ReadOnlySpan 零内存拷贝
+    private static int ComputeFastChecksum(ReadOnlySpan<byte> bytes)
+    {
+        int checksum = 0;
+        foreach (byte b in bytes)
+        {
+            checksum ^= b;
+        }
+
+        return checksum;
     }
 }
