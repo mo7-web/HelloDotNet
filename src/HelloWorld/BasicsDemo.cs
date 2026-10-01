@@ -1,151 +1,112 @@
 namespace MyDemo.Basics;
 
-public class BasicsDemo
+// 纯静态类：禁止实例化，对标 Go 的独立 package 文件
+public static class BasicsDemo
 {
-
     public static void Run()
     {
-        // ==========================================
-        // 1.1 基础数值类型与字面量后缀
-        // ==========================================
+        Console.WriteLine("=== [1.1 基元数值与高精度体系] ===");
+        DemonstrateNumericPrimitives();
 
-        Console.WriteLine("=== [1.1~1.3 基元与字符串演练] ===");
+        Console.WriteLine("\n=== [1.2 变量声明、集合表达式与零值体系] ===");
+        DemonstrateVariablesAndDefaults();
 
-        NumberDemo();
-        StringDemo();
-
-        // 整型家族
-        int standardInt = 42;                 // [Go: int32] / [JS: number] 默认32位有符号整型
-        long largeInt = 9_000_000_000L;       // [Go: int64] / [JS: bigint] 64位整型，后缀 L，下划线为数字分隔符
-        uint unsignedInt = 100U;              // [Go: uint32] 无符号整型，后缀 U
-        ulong unsignedLarge = 200UL;          // [Go: uint64] 无符号64位，后缀 UL
-
-        Console.WriteLine($"[整型演示] Int: {standardInt}, Long: {largeInt}, UInt: {unsignedInt}, ULong: {unsignedLarge}");
-
-        // 浮点与高精度（重点：涉及金额绝不用 double/float）
-        double defaultDouble = 3.1415926535;  // [Go: float64] / [JS: number] 默认浮点类型（IEEE 754 双精度）
-        float singleFloat = 3.14f;            // [Go: float32] 单精度浮点，强制后缀 f
-        decimal exactMoney = 199.99m;         // [Go: shopspring/decimal] 128位定点数，绝无浮点精度丢失，强制后缀 m
-
-        Console.WriteLine($"[浮点演示] Double: {defaultDouble}, Float: {singleFloat}, Decimal: {exactMoney}");
-
-        // 布尔与字符
-        bool isEnabled = true;                // [Go: bool] / [JS: boolean]
-        char letter = 'A';                    // [Go: rune] / [JS: string] 16位 Unicode 字符，单引号包裹
-
-        Console.WriteLine($"[布尔与字符演示] Bool: {isEnabled}, Char: {letter}");
-
-        // ==========================================
-        // 1.2 变量声明、类型推导与零值体系
-        // ==========================================
-
-        // 静态推导 (var)
-        var inferredDouble = 1.0;             // [Go: v := 1.0] [TS: let v = 1.0] 编译期推导为 double
-        var inferredList = new int[] { 1, 2 }; // 编译期推导为 int[]，推导后不可赋给其他类型
-
-        Console.WriteLine($"[类型推导演示] Inferred Double: {inferredDouble}, Inferred List Length: {inferredList.Length}");
-
-        // 零值机制 (default)
-        int defaultInt = default;             // [Go: var a int 产生的 0] 零值: 0
-        bool defaultBool = default;           // [Go: var b bool 产生的 false] 零值: false
-        string? defaultRef = default;         // [Go: nil] / [JS: null] 引用类型的零值: null
-
-        Console.WriteLine($"[零值演示] Int default: {defaultInt}, Bool default: {defaultBool}, String default: {defaultRef ?? "NULL"}");
-
-        decimal defaultMoney = default;       // 零值: 0.0m
-
-        Console.WriteLine($"[零值演示] Decimal default: {defaultMoney}");
-
-        // 常量定义
-        const double Pi = 3.1415926;          // [Go: const Pi = 3.1415926] 编译期常量，直接内联到机器码中
-
-        Console.WriteLine($"[常量演示] Pi: {Pi}");
-
-        // ==========================================
-        // 1.3 现代字符串核心操作与 Native AOT 特性
-        // ==========================================
-
-        string userName = "Alice";
-
-        // 1. 传统字符串插值
-        // [JS: `Hello, ${userName}!`] / [Go: fmt.Sprintf("Hello, %s!", userName)]
-        string welcomeMsg = $"Hello, {userName}! Balance: {exactMoney:C2}"; // :C2 为货币格式化
-
-        // 2. 原始字符串字面量 (Raw String Literals) - C# 11+
-        // [Go: 反引号 `{"key": "value"}`] / [JS: 模版字符串无转义版]
-        // 规则：至少 3 个双引号开头和结尾。内容中的双引号无需转义，并且自动移除以末行 """ 对齐的前导空格。
-        string jsonPayload = """
-    {
-        "userId": 1001,
-        "name": "Alice",
-        "roles": ["admin", "developer"],
-        "isActive": true
-    }
-    """;
-
-        // 3. UTF-8 字节字面量 (Native AOT 高性能关键)
-        // [Go: []byte("PING")] - C# 直接在编译期生成只读内存切片，无堆内存分配、无 UTF-16 转码开销
-        ReadOnlySpan<byte> utf8Ping = "PING"u8;
-
-        // ==========================================
-        // 控制台输出验证
-        // ==========================================
-        Console.WriteLine($"[原始多行 JSON]\n{jsonPayload}");
-        Console.WriteLine($"[UTF-8 字节切片长度] Length: {utf8Ping.Length}");
+        Console.WriteLine("\n=== [1.3 现代字符串与 UTF-8 内存切片] ===");
+        DemonstrateStringsAndMemory();
     }
 
-    private static void NumberDemo()
+    // ==========================================
+    // 1.1 基元数值类型与字面量后缀
+    // ==========================================
+    private static void DemonstrateNumericPrimitives()
     {
         int population = 67_000_000;
         long distance = 384_400_000L;
         short temperature = -40;
         byte red = 255;
-
         double pi = 3.141592653589793;
         float gravity = 9.81f;
         decimal price = 19.99m;
+
+        // 原始多行插值字符串：以最后一行 """ 的缩进为基准，前导空白在编译期自动裁切
+        // 映射：比 Go 的 `...` 强大（支持直接插值），比 TS 的 `...` 干净（免 strip-indent）
         Console.WriteLine(
-          $"""
-    population  {population}
-    distance    {distance}
-    temperature {temperature}
-    red         {red}
-    pi          {pi}
-    gravity     {gravity}
-    price       {price}
-    """
+            $"""
+        population  {population}
+        distance    {distance}
+        temperature {temperature}
+        red         {red}
+        pi          {pi}
+        gravity     {gravity}
+        price       {price}
+        """
         );
     }
 
-    private static void StringDemo()
+    // ==========================================
+    // 1.2 变量推导、集合表达式与零值机制
+    // ==========================================
+    private static void DemonstrateVariablesAndDefaults()
     {
-        char newline = '\n';
-        char unicode = '\u0041'; // 'A'
+        // 1. 显式类型 vs 局部推导
+        double inferredDouble = 1.0;          // [Go: v := 1.0] [TS: let v = 1.0] 优先使用具体类型明确语义
 
-        var greeting = "Hello, World!";
-        var dec = 42;
+        // 现代集合表达式（编译期优化，对标 Go 的切片字面量 []int{1, 2}）
+        int[] numbers = [1, 2];
 
-        string message = $"Found {dec} items"; // interpolated string
-        string path = @"C:\Users\docs\file.txt"; // verbatim string
-        string json = """
-    { "name": "Alice", "age": 30 }
-    """; // raw string literal
-        string raw = $"""
-    Found {dec} items in "{greeting}"
-    """; // raw + interpolated
+        Console.WriteLine($"[推导与集合] Double: {inferredDouble}, Array Length: {numbers.Length}");
 
-        Console.WriteLine(
-          $"""
-    newline  {newline}
-    unicode  {unicode}
-    greeting {greeting}
-    dec      {dec}
-    message  {message}
-    path     {path}
-    json     {json}
-    raw      {raw}
-    """
-        );
+        // 2. 确定性常量（编译期直接内联至机器码）
+        const double Pi = 3.1415926;          // [Go: const Pi = 3.1415926]
+        Console.WriteLine($"[编译期常量] Pi: {Pi}");
+
+        // 3. 零值体系 (default)
+        int defaultInt = default;             // 零值: 0 [Go: var a int]
+        bool defaultBool = default;           // 零值: false [Go: var b bool]
+        decimal defaultMoney = default;       // 零值: 0.0m
+        string? defaultRef = default;         // 零值: null [Go: nil / TS: null]
+
+        // 消除行内 ?? 压缩语法，显式断点判定（对标 Go 显式 nil 校验）
+        string displayRef = "NULL";
+        if (defaultRef != null)
+        {
+            displayRef = defaultRef;
+        }
+
+        Console.WriteLine($"[零值体系] Int: {defaultInt}, Bool: {defaultBool}, Decimal: {defaultMoney}, Ref: {displayRef}");
     }
 
+    // ==========================================
+    // 1.3 现代字符串与 Native AOT 特性
+    // ==========================================
+    private static void DemonstrateStringsAndMemory()
+    {
+        string userName = "Alice";
+        decimal balance = 199.99m;
+
+        // 1. 现代字符串插值（Native AOT 编译期通过 DefaultInterpolatedStringHandler 实现零分配构建）
+        string welcomeMsg = $"Hello, {userName}! Balance: {balance}";
+        Console.WriteLine($"[字符串插值] {welcomeMsg}");
+
+        // 2. 原始字符串字面量 (Raw String Literals) - C# 11+
+        // 映射：对标 Go 的反引号多行文本 `{"key": "value"}`，内容中无需转义双引号
+        string jsonPayload = """
+        {
+            "userId": 1001,
+            "name": "Alice",
+            "roles": ["admin", "developer"],
+            "isActive": true
+        }
+        """;
+        Console.WriteLine($"[原始多行 JSON]\n{jsonPayload}");
+
+        // 3. UTF-8 字节字面量（Native AOT 高性能关键基石）
+        // 映射：对标 Go 的 []byte("PING")。C# 在编译期将其直接固化至只读数据段，完全不经过 UTF-16 转码，零堆分配
+        ReadOnlySpan<byte> utf8Ping = "PING"u8;
+        Console.WriteLine($"[只读 UTF-8 内存切片] Length: {utf8Ping.Length} bytes, First Byte: {utf8Ping[0]}");
+
+        // 4. 原生路径字符串（消除反斜杠转义）
+        string filePath = @"C:\Users\docs\file.txt";
+        Console.WriteLine($"[原样路径] {filePath}");
+    }
 }
