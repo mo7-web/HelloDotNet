@@ -1,28 +1,29 @@
 namespace MyDemo.Threading;
 
-using System.Globalization;
-using System.Threading.Channels; // 核心：对标 Go channel 的高性能通道库
+using System;
+using System.Threading;
+using System.Threading.Channels;
 
 public static class ThreadConcurrencyDemo
 {
-    // C# 13+ / .NET 9+ 引入的全新原生专用锁对象（取代老旧的 object lock，性能更强且防止死锁）
-    // [Go: mu sync.Mutex]
-    private static readonly Lock ThreadLock = new();
+    // C# 13+ / .NET 9+ 原生专用锁对象（禁用隐式 new()，显式写明 new Lock()）
+    // 对标 Go: mu sync.Mutex
+    private static readonly Lock ThreadLock = new Lock();
 
-    // 共享计数器
-    private static int _unsafeCounter;
-    private static int _atomicCounter;
+    // 共享静态计数器
+    private static int unsafeCounter;
+    private static int atomicCounter;
 
     public static async Task RunAsync()
     {
         Console.WriteLine("=== [多线程本质：验证 C# 真实的物理线程切换] ===");
-        await DemonstrateThreadSwitchingAsync();
+        await ThreadConcurrencyDemo.DemonstrateThreadSwitchingAsync();
 
         Console.WriteLine("\n=== [多线程数据传递：System.Threading.Channels (对标 Go chan)] ===");
-        await DemonstrateChannelsAsync();
+        await ThreadConcurrencyDemo.DemonstrateChannelsAsync();
 
         Console.WriteLine("\n=== [多线程竞态与同步：Interlocked vs 现代 Lock] ===");
-        await DemonstrateSynchronizationAsync();
+        await ThreadConcurrencyDemo.DemonstrateSynchronizationAsync();
     }
 
     // ==========================================
@@ -30,14 +31,14 @@ public static class ThreadConcurrencyDemo
     // ==========================================
     private static async Task DemonstrateThreadSwitchingAsync()
     {
-        // 打印当前执行的物理内核线程 ID
-        Console.WriteLine($"[Thread Audit] await 前物理线程 ID: {Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture)}");
+        // 插值字符串内部直接填变量名，消灭 .ToString() 带来的多余堆内存分配
+        Console.WriteLine($"[Thread Audit] await 前物理线程 ID: {Environment.CurrentManagedThreadId}");
 
-        // 模拟一个非阻塞 IO，底层将控制权还给线程池
+        // 模拟非阻塞 IO，底层将控制权还给线程池工作调度器
         await Task.Delay(50);
 
-        // 观察：await 唤醒后，极大概率已经被调度到了另外一个完全不同的物理线程！
-        Console.WriteLine($"[Thread Audit] await 后物理线程 ID: {Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture)} (证明 C# 异步天生处于多线程环境)");
+        // await 唤醒后大概率处于线程池的另外一个物理线程
+        Console.WriteLine($"[Thread Audit] await 后物理线程 ID: {Environment.CurrentManagedThreadId} (证明 C# 异步天生处于多线程环境)");
     }
 
     // ==========================================
@@ -45,44 +46,43 @@ public static class ThreadConcurrencyDemo
     // ==========================================
     private static async Task DemonstrateChannelsAsync()
     {
-        // 创建一个有界通道（容量为 5），背压（Backpressure）策略为等待
-        // [Go: ch := make(chan string, 5)]
-        var channel = Channel.CreateBounded<string>(new BoundedChannelOptions(capacity: 5)
+        // 显式声明 Channel<string>，拒绝盲盒 var 推导
+        // 对标 Go: ch := make(chan string, 5)
+        Channel<string> channel = Channel.CreateBounded<string>(new BoundedChannelOptions(capacity: 5)
         {
             FullMode = BoundedChannelFullMode.Wait,
             SingleWriter = false,
             SingleReader = false
         });
 
-        // 启动生产者线程任务 (模拟并发推送)
-        // [Go: go func() { ... }()]
-        var producerTask = Task.Run(async () =>
+        // 启动生产者线程任务（对标 Go: go func() { ... }()）
+        Task producerTask = Task.Run(async () =>
         {
             for (int i = 1; i <= 3; i++)
             {
-                string msg = $"Telemetry-Event-{i.ToString(CultureInfo.InvariantCulture)}";
-                // 写入通道 [Go: ch <- msg]
+                string msg = $"Telemetry-Event-{i}";
+                // 写入通道（对标 Go: ch <- msg）
                 await channel.Writer.WriteAsync(msg);
-                Console.WriteLine($"[Producer Thread {Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture)}] Pushed: {msg}");
+                Console.WriteLine($"[Producer Thread {Environment.CurrentManagedThreadId}] Pushed: {msg}");
                 await Task.Delay(20);
             }
 
-            // 完成发送，关闭通道写入端 [Go: close(ch)]
+            // 完成发送，关闭通道写入端（对标 Go: close(ch)）
             channel.Writer.Complete();
         });
 
-        // 启动消费者任务 (跨线程消费)
-        // [Go: for msg := range ch { ... }]
-        var consumerTask = Task.Run(async () =>
+        // 启动消费者任务
+        Task consumerTask = Task.Run(async () =>
         {
-            // ReadAllAsync: 优雅消费通道，通道关闭且读空后自动退出循环
-            await foreach (var item in channel.Reader.ReadAllAsync())
+            // ReadAllAsync: 优雅消费通道，读空且关闭后自动跳出循环（对标 Go: for msg := range ch）
+            // 显式声明 string item，拒绝 var 盲盒
+            await foreach (string item in channel.Reader.ReadAllAsync())
             {
-                Console.WriteLine($"[Consumer Thread {Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture)}] Consumed: {item}");
+                Console.WriteLine($"[Consumer Thread {Environment.CurrentManagedThreadId}] Consumed: {item}");
             }
         });
 
-        // 等待生产者与消费者全流程结束 [Go: sync.WaitGroup]
+        // 协同等待生产者与消费者退出（对标 Go: sync.WaitGroup）
         await Task.WhenAll(producerTask, consumerTask);
     }
 
@@ -91,13 +91,13 @@ public static class ThreadConcurrencyDemo
     // ==========================================
     private static async Task DemonstrateSynchronizationAsync()
     {
-        _unsafeCounter = 0;
-        _atomicCounter = 0;
+        // 静态成员严格携带宿主类名前缀
+        ThreadConcurrencyDemo.unsafeCounter = 0;
+        ThreadConcurrencyDemo.atomicCounter = 0;
 
-        // 开启 10 个并发线程任务，每个任务累加 1,000 次
         const int taskCount = 10;
         const int incrementsPerTask = 1000;
-        var tasks = new Task[taskCount];
+        Task[] tasks = new Task[taskCount];
 
         for (int i = 0; i < taskCount; i++)
         {
@@ -106,15 +106,14 @@ public static class ThreadConcurrencyDemo
                 for (int j = 0; j < incrementsPerTask; j++)
                 {
                     // 场景 A：无保护裸写（引发数据竞态 Data Race）
-                    _unsafeCounter++;
+                    ThreadConcurrencyDemo.unsafeCounter++;
 
-                    // 场景 B：硬件级原子操作 [Go: atomic.AddInt32(&_atomicCounter, 1)]
-                    // 编译为单个 CPU 级别的 LOCK XADD 汇编指令，零锁，纳秒级
-                    Interlocked.Increment(ref _atomicCounter);
+                    // 场景 B：硬件级原子操作
+                    // 底层编译为单个 CPU 级别的 LOCK XADD 汇编指令（对标 Go: atomic.AddInt32）
+                    Interlocked.Increment(ref ThreadConcurrencyDemo.atomicCounter);
 
-                    // 场景 C：现代 Lock 语法糖
-                    // [Go: mu.Lock(); defer mu.Unlock()]
-                    lock (ThreadLock)
+                    // 场景 C：现代原生 Lock（进入临界区，对标 Go: mu.Lock() / defer mu.Unlock()）
+                    lock (ThreadConcurrencyDemo.ThreadLock)
                     {
                         // 临界区代码，多线程强互斥排队进入
                     }
@@ -124,7 +123,7 @@ public static class ThreadConcurrencyDemo
 
         await Task.WhenAll(tasks);
 
-        Console.WriteLine($"[竞态导致数据丢失] Unsafe Counter: {_unsafeCounter.ToString(CultureInfo.InvariantCulture)} (理论应为 10000)");
-        Console.WriteLine($"[原子操作安全保障] Atomic Counter: {_atomicCounter.ToString(CultureInfo.InvariantCulture)} (理论应为 10000)");
+        Console.WriteLine($"[竞态导致数据丢失] Unsafe Counter: {ThreadConcurrencyDemo.unsafeCounter} (理论应为 10000)");
+        Console.WriteLine($"[原子操作安全保障] Atomic Counter: {ThreadConcurrencyDemo.atomicCounter} (理论应为 10000)");
     }
 }
