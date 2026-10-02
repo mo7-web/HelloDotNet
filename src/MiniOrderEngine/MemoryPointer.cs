@@ -1,44 +1,55 @@
-using System.Globalization;
-
 namespace MemoryPointer;
 
-public struct BadParse
+using System;
+using System.Globalization;
+
+// 纯静态方法容器，显式声明为 static class，杜绝实例化
+public static class BadParse
 {
-    // 从网络接收到一段行情文本数据："BTCUSDT,65432.10,1500"（交易对、价格、数量）。
-    // 每一帧都会产生巨额 GC 垃圾的传统写法：
+    // 每一帧都会产生巨额 GC 垃圾的传统写法（反面教材演示）
     public static void Parse(string rawData)
     {
-        // 灾难 1：Split 会在堆上分配一个 string[] 数组
-        // 灾难 2：Split 还会为切分出来的 3 个子片段在堆上分配 3 个全新的 string 对象！
+        // 灾难：Split 在堆上分配 string[] 数组，并为子字符串分配 3 个全新 string 对象
         string[] parts = rawData.Split(',');
 
         string symbol = parts[0];
         decimal price = decimal.Parse(parts[1], CultureInfo.InvariantCulture);
         int volume = int.Parse(parts[2], CultureInfo.InvariantCulture);
-        // 哪怕后续啥都不干，这一次解析就已经在堆上丢弃了 4 个垃圾对象！
     }
 }
 
-public readonly record struct ParsedTick(decimal Price, int Volume);
-
-public class FastParser
+// 展开为主构造函数剥离形态：传统构造函数 + 显式 this 赋值
+public readonly record struct ParsedTick
 {
-    // 核心入参：ReadOnlySpan<char>（只读内存切片，不拷贝字符串）
+    public decimal Price { get; init; }
+    public int Volume { get; init; }
+
+    public ParsedTick(decimal price, int volume)
+    {
+        this.Price = price;
+        this.Volume = volume;
+    }
+}
+
+public static class FastParser
+{
+    // 核心入参：ReadOnlySpan<char>（只读内存切片，不拷贝字符串，零堆分配）
     public static bool TryParseTick(ReadOnlySpan<char> rawSpan, out ParsedTick result)
     {
-        result = default;
+        // 显式零值，拒绝裸 default 推导
+        result = default(ParsedTick);
 
-        // 1. 寻找第一个逗号的位置（硬件 SIMD 指令加速寻找）
+        // 1. 寻找第一个逗号
         int firstComma = rawSpan.IndexOf(',');
         if (firstComma == -1)
         {
             return false;
         }
 
-        // 切片获取 Symbol，纯粹是指针偏移，无任何堆内存分配！
+        // 纯指针切片，不产生任何 string 分配
         ReadOnlySpan<char> symbolSpan = rawSpan.Slice(0, firstComma);
 
-        // 2. 截取剩余部分
+        // 2. 截取剩余部分并寻找第二个逗号
         ReadOnlySpan<char> remaining = rawSpan.Slice(firstComma + 1);
         int secondComma = remaining.IndexOf(',');
         if (secondComma == -1)
@@ -49,20 +60,18 @@ public class FastParser
         ReadOnlySpan<char> priceSpan = remaining.Slice(0, secondComma);
         ReadOnlySpan<char> volumeSpan = remaining.Slice(secondComma + 1);
 
-        // 3. 直接在 Span 切片上进行数字解析（.NET 核心库对 Span 有全套原生支持）
-        // 整个解析过程不需要将 Span 转换回 string，直接在原始字符物理地址上扫描！
-        if (!decimal.TryParse(priceSpan, out decimal price))
+        // 3. 在原始物理切片上直接解析数值（显式传递 InvariantCulture 消除国际化歧义）
+        if (!decimal.TryParse(priceSpan, CultureInfo.InvariantCulture, out decimal price))
         {
             return false;
         }
 
-        if (!int.TryParse(volumeSpan, out int volume))
+        if (!int.TryParse(volumeSpan, CultureInfo.InvariantCulture, out int volume))
         {
             return false;
         }
 
         result = new ParsedTick(price, volume);
-
         return true;
     }
 }
