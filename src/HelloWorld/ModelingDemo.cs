@@ -1,66 +1,94 @@
 namespace MyDemo.Modeling;
 
+using System;
 using System.Globalization;
 
 // ==========================================
 // 4.4 接口与契约定义
+// 对标 Go: type Runner interface { Run() string }
 // ==========================================
-// [Go: type Runner interface { Run() string }] / [TS: interface IRunner { run(): string }]
 public interface IRunner
 {
     string Run();
 }
 
 // ==========================================
-// 4.1 类（Class）、主构造函数、required 与 init
+// 4.1 类（Class）：显式字段、传统构造函数与属性
 // ==========================================
-// 主构造函数 (Primary Constructor): endpoint 和 timeoutMs 在整类作用域内有效
-// [TS: class NetworkClient(private endpoint: string) { ... }]
-public class NetworkClient(string endpoint, int timeoutMs) : IRunner
+public class NetworkClient : IRunner
 {
-    // 现代属性：只读初始化 init（构建后不可篡改）与 required（实例化时强制必填）
-    // 编译器杜绝“未初始化就使用”的经典空指针缺陷
-    public required string AuthToken { get; init; }
+    // 显式私有成员，拒绝主构造函数的隐式黑盒捕获
+    private readonly string endpoint;
+    private readonly int timeoutMs;
 
-    // 普通自动读写属性
+    public required string AuthToken { get; init; }
     public bool EnableCompression { get; set; } = true;
 
-    // 显式实现接口方法
+    // 传统显式构造函数，参数严格绑定至 this
+    public NetworkClient(string endpoint, int timeoutMs)
+    {
+        this.endpoint = endpoint;
+        this.timeoutMs = timeoutMs;
+    }
+
     public string Run()
     {
-        return $"[Client] Connected to {endpoint} (Timeout: {timeoutMs.ToString(CultureInfo.InvariantCulture)}ms, Token: {AuthToken})";
+        // 访问成员强制携带 this.，静态格式化携带类名
+        return $"[Client] Connected to {this.endpoint} (Timeout: {this.timeoutMs}ms, Token: {this.AuthToken})";
     }
 }
 
 // ==========================================
-// 4.2 数据实体神器：record (不可变 DTO 的终极形态)
+// 4.2 数据实体：record（展开为主构造函数剥离形态）
 // ==========================================
-// 一行代码定义：自动拥有属性、构造器、解构器、ToString 格式化和基于值的相等性比较
-// [Go: type UserProfile struct { ... } 但自带深度值比对与 ToString]
-public record UserProfile(int Id, string DisplayName, string Role);
-
-// ==========================================
-// 4.3 结构体（struct）与内存本质（栈 vs 堆）
-// ==========================================
-// 推荐最佳实践：永远优先使用 readonly struct，杜绝可变结构体的防御性拷贝陷阱
-// [Go: type Point struct { X, Y int } 传值语义]
-public readonly struct Point(int x, int y)
+public record UserProfile
 {
-    public int X { get; } = x;
-    public int Y { get; } = y;
+    public int Id { get; init; }
+    public string DisplayName { get; init; }
+    public string Role { get; init; }
 
-    // 结构体表达式主体方法
+    // 显式传统构造函数
+    public UserProfile(int id, string displayName, string role)
+    {
+        this.Id = id;
+        this.DisplayName = displayName;
+        this.Role = role;
+    }
+}
+
+// ==========================================
+// 4.3 结构体（struct）：纯栈上高性能值对象
+// ==========================================
+public readonly struct Point
+{
+    public int X { get; init; }
+    public int Y { get; init; }
+
+    // 显式传统构造函数
+    public Point(int x, int y)
+    {
+        this.X = x;
+        this.Y = y;
+    }
+
+    // 拒绝隐式 new()，显式写明返回的具体类型 Point，访问属性带 this.
     public Point Translate(int dx, int dy)
     {
-        return new(X + dx, Y + dy);
+        return new Point(this.X + dx, this.Y + dy);
     }
 }
 
-// 可变结构体（反面教材演示：用于验证值传递深拷贝）
+// 可变结构体（反面教材演示：用于验证栈内存深拷贝）
 public struct MutableCoordinate
 {
     public int Latitude { get; set; }
     public int Longitude { get; set; }
+
+    public MutableCoordinate(int latitude, int longitude)
+    {
+        this.Latitude = latitude;
+        this.Longitude = longitude;
+    }
 }
 
 // ==========================================
@@ -70,51 +98,35 @@ public static class ModelingDemo
 {
     public static void Run()
     {
-        Console.WriteLine("=== [4.1 现代 Class 与主构造函数] ===");
-        DemonstrateClassAndInit();
+        Console.WriteLine("=== [4.1 显式 Class 与构造初始化] ===");
+        ModelingDemo.DemonstrateClassAndInit();
 
         Console.WriteLine("\n=== [4.2 记录类型 Record 与不可变突变 (with)] ===");
-        DemonstrateRecords();
+        ModelingDemo.DemonstrateRecords();
 
         Console.WriteLine("\n=== [4.3 结构体与堆栈内存物理差异] ===");
-        DemonstrateStructVsClass();
+        ModelingDemo.DemonstrateStructVsClass();
     }
 
     public static void Execute<T>(T runner) where T : IRunner
     {
-        // 内部可以安全调用 IRunner 接口定义的 Run()
         string result = runner.Run();
         Console.WriteLine($"执行结果: {result}");
     }
 
     private static void DemonstrateClassAndInit()
     {
-
-        // 1. 具体类型实例化与属性校验
+        // 允许 var：右侧显式存在 new NetworkClient
         var client = new NetworkClient("https://api.internal:8443", 5000)
         {
             AuthToken = "Bearer sk_sec_9999",
             EnableCompression = false
         };
 
-        // 隐式类型推导（推荐！编译器会自动推导 T 为 NetworkClient）
-        Execute(client);
+        // 静态方法调用必须显式携带类名
+        ModelingDemo.Execute(client);
 
-        /*
-        相当于:
-            // 编译器自动生成的底层逻辑：
-            NetworkClient temp = new NetworkClient("https://api.internal:8443", 5000); // 1. 先跑构造函数
-            temp.AuthToken = "Bearer sk_sec_9999";  // 2. 依次给属性赋值 但因为  AuthToken ( get; init; ) 只能在构建阶段赋值 所以会报错。
-            temp.EnableCompression = false;                                          // 3. 依次给属性赋值
-            var client = temp;  // 4. 最后才把完整对象交给你
-
-
-        */
-
-        // 2. 本地直接调用具体类型：触发编译器去虚拟化与内联，享受极限性能
         Console.WriteLine($"[Concrete Direct Call] {client.Run()}");
-
-        // client.AuthToken = "change"; // 编译错误！init 属性仅在构建阶段允许赋值
     }
 
     private static void DemonstrateRecords()
@@ -122,38 +134,37 @@ public static class ModelingDemo
         var admin = new UserProfile(1001, "Arch-Dev", "SuperAdmin");
         var adminClone = new UserProfile(1001, "Arch-Dev", "SuperAdmin");
 
-        // 1. 自动重写 ToString()：格式化打印极其友好，无需手写
         Console.WriteLine($"Record Print: {admin}");
 
-        // 2. 基于“值相等（Value Equality）”：两个独立堆对象，只要内部数据一致，== 结果就是 true！
-        // [TS / JS 的引用比对会是 false；Go 纯 struct 比对是 true]
+        // 1. 值相等比对（Value Equality）
         bool isValueEqual = (admin == adminClone);
-        bool isRefEqual = ReferenceEquals(admin, adminClone);
+        // 静态方法严格携带宿主 object
+        bool isRefEqual = object.ReferenceEquals(admin, adminClone);
         Console.WriteLine($"Values Equal: {isValueEqual}, References Equal: {isRefEqual}");
 
-        // 3. 非破坏性突变 (Non-destructive Mutation via 'with')
-        // [JS: const editor = { ...admin, Role: "Editor" }]
-        // [Go 需要显式拷贝结构体并改属性]
-        var editor = admin with { Role = "Editor" };
+        // 2. 非破坏性突变 (with 表达式)：左侧禁止盲盒 var，必须显式声明类型
+        UserProfile editor = admin with { Role = "Editor" };
         Console.WriteLine($"Mutated Copy: {editor}");
         Console.WriteLine($"Original Unchanged: {admin}");
     }
 
     private static void DemonstrateStructVsClass()
     {
-        // 场景 1：验证 struct 默认是“栈上传值拷贝（Pass-by-value / Deep Copy）”
-        var originalCoord = new MutableCoordinate { Latitude = 10, Longitude = 20 };
-        ModifyStruct(originalCoord); // 发生栈内存浅拷贝，原变量毫发无损
+        // 场景 1：栈内存深拷贝验证
+        var originalCoord = new MutableCoordinate(10, 20);
+        ModelingDemo.ModifyStruct(originalCoord);
         Console.WriteLine($"Struct Original after Modify: Lat={originalCoord.Latitude.ToString(CultureInfo.InvariantCulture)} (未被外部修改)");
 
-        // 场景 2：只读结构体（零 GC 开销的高性能值对象）
+        // 场景 2：只读结构体（零 GC 开销）
         var p1 = new Point(5, 10);
-        var p2 = p1.Translate(1, 2);
+        // 方法返回类型不明显，左侧禁止盲盒 var，显式声明 Point
+        Point p2 = p1.Translate(1, 2);
         Console.WriteLine($"Point translated: X={p2.X.ToString(CultureInfo.InvariantCulture)}, Y={p2.Y.ToString(CultureInfo.InvariantCulture)}");
     }
 
     private static void ModifyStruct(MutableCoordinate coord)
     {
-        coord.Latitude = 999; // 仅修改了当前函数栈帧里的副本，调用方无感知
+        // 仅修改了当前函数栈帧里的副本（8 字节值拷贝），调用方无感知
+        coord.Latitude = 999;
     }
 }
