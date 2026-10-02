@@ -1,5 +1,7 @@
 namespace MyDemo.Collections;
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 public static class CollectionsDemo
@@ -7,13 +9,13 @@ public static class CollectionsDemo
     public static void Run()
     {
         Console.WriteLine("=== [3.1 集合表达式与切片内存实操] ===");
-        DemonstrateCollectionExpressionsAndSlices();
+        CollectionsDemo.DemonstrateCollectionExpressionsAndSlices();
 
         Console.WriteLine("\n=== [3.2 核心集合容器实操] ===");
-        DemonstrateCoreCollections();
+        CollectionsDemo.DemonstrateCoreCollections();
 
-        Console.WriteLine("\n=== [3.3 声明式数据流 LINQ 实操] ===");
-        DemonstrateLinq();
+        Console.WriteLine("\n=== [3.3 声明式数据处理（扁平平铺展开）] ===");
+        CollectionsDemo.DemonstrateDataProcessing();
     }
 
     // ==========================================
@@ -21,25 +23,24 @@ public static class CollectionsDemo
     // ==========================================
     private static void DemonstrateCollectionExpressionsAndSlices()
     {
-        // 1. C# 12+ 统一集合表达式 [JS: [1, 2, 3] / Go: []int{1, 2, 3}]
+        // 1. 统一集合表达式与展开操作符 (Spread Operator)
         int[] partA = [1, 2, 3];
         int[] partB = [4, 5, 6];
 
-        // 展开操作符 (Spread Operator) [JS: [...partA, 99, ...partB]]
         int[] merged = [.. partA, 99, .. partB];
         Console.WriteLine($"Merged Length: {merged.Length}, Middle: {merged[3]}");
 
-        // 2. 现代倒数索引 (Index from end: ^) [JS: at(-1) / Go: len(s)-1]
-        int lastItem = merged[^1];  // 等价于 merged[merged.Length - 1]，即 6
-        int secondLast = merged[^2]; // 5
+        // 2. 现代倒数索引 (Index from end: ^)
+        int lastItem = merged[^1];
+        int secondLast = merged[^2];
         Console.WriteLine($"Last: {lastItem}, 2nd Last: {secondLast}");
 
-        // 3. 陷阱：普通数组切片 (触发堆分配与深拷贝)
-        int[] heapCopiedSlice = merged[1..4]; // 取索引 1, 2, 3 构成新数组 [JS: slice(1, 4)]
+        // 3. 普通数组切片：触发新数组分配与深拷贝（有 GC 堆压力）
+        int[] heapCopiedSlice = merged[1..4];
         Console.WriteLine($"Heap Copied Slice Len: {heapCopiedSlice.Length}");
 
-        // 4. 极致性能：Span 切片 (完全等价于 Go 切片，纯栈引用指针，零拷贝，Native AOT 核心)
-        ReadOnlySpan<int> zeroCopySlice = merged.AsSpan()[1..4]; // [Go: merged[1:4]]
+        // 4. Span 切片：纯栈上指针与长度结构体，零堆拷贝（Native AOT 核心基石，对标 Go 切片）
+        ReadOnlySpan<int> zeroCopySlice = merged.AsSpan()[1..4];
         Console.WriteLine($"Zero-copy Span Slice Len: {zeroCopySlice.Length}, First: {zeroCopySlice[0]}");
     }
 
@@ -48,21 +49,19 @@ public static class CollectionsDemo
     // ==========================================
     private static void DemonstrateCoreCollections()
     {
-        // 1. 动态数组 List<T> [Go: []T 动态扩容切片 / JS: Array]
-        // 性能技巧：已知数据量时指定 Capacity 避免扩容复制 [Go: make([]int, 0, 10)]
-        List<string> frameworks = new(capacity: 10) { "ASP.NET Core", "React" };
+        // 1. 动态数组 List<T>：显式类型实例化，禁止 new()
+        List<string> frameworks = new List<string>(capacity: 10) { "ASP.NET Core", "React" };
         frameworks.Add("Vue");
-        frameworks.AddRange(["Svelte", "Next.js"]); // 批量添加
+        frameworks.AddRange(["Svelte", "Next.js"]);
         Console.WriteLine($"List Count: {frameworks.Count}, First: {frameworks[0]}");
 
-        // 2. 哈希字典 Dictionary<TKey, TValue> [Go: map[K]V / JS: Map]
-        // 也支持集合表达式初始化
-        Dictionary<string, int> memoryUsage = new()
+        // 2. 哈希字典 Dictionary<TKey, TValue>：显式类型实例化
+        Dictionary<string, int> memoryUsage = new Dictionary<string, int>()
         {
             ["Kernel"] = 64,
             ["CliApp"] = 12
         };
-        memoryUsage["CliApp"] = 15; // 覆盖赋值
+        memoryUsage["CliApp"] = 15;
 
         // 安全取值 (类比 Go: val, ok := m[key])
         if (memoryUsage.TryGetValue("CliApp", out int usageMb))
@@ -70,38 +69,65 @@ public static class CollectionsDemo
             Console.WriteLine($"CliApp Memory: {usageMb.ToString(CultureInfo.InvariantCulture)} MB");
         }
 
-        // 3. 无序唯一集 HashSet<T> [JS: Set / Go: map[T]struct{}]
+        // 3. 无序唯一集 HashSet<T>
         HashSet<string> uniqueTags = ["backend", "performance", "aot"];
-        bool addedNew = uniqueTags.Add("aot"); // 重复添加，返回 false
+        bool addedNew = uniqueTags.Add("aot");
         Console.WriteLine($"HashSet Count: {uniqueTags.Count}, Added duplicate: {addedNew}");
     }
 
     // ==========================================
-    // 3.3 声明式数据查询 (LINQ 入门)
+    // 3.3 数据处理：平铺展开（彻底消除长链式 LINQ 与盲盒推导）
     // ==========================================
-    private static void DemonstrateLinq()
+    private static void DemonstrateDataProcessing()
     {
-        // 准备只读数据源
         List<int> rawScores = [45, 82, 95, 60, 30, 88, 100, 74];
 
-        // 链式声明式查询
-        // [JS: scores.filter(...).sort(...).map(...)]
-        var processedScores = rawScores
-            .Where(score => score >= 60)              // 过滤及格分数 [JS: .filter()]
-            .OrderByDescending(score => score)        // 降序排序 [JS: .sort((a, b) => b - a)]
-            .Select(score => $"Ranked-{score}")       // 映射转换 [JS: .map()]
-            .ToList();                                // 立即求值，物化为 List<string>
+        // 1. 重构长链式 LINQ 为平铺 foreach 管道（Go 风格）
+        // 显式声明容量，杜绝多次扩容重分配
+        List<int> passingScores = new List<int>(capacity: rawScores.Count);
+        foreach (int score in rawScores)
+        {
+            if (score >= 60)
+            {
+                passingScores.Add(score);
+            }
+        }
+
+        // 原地排序（In-place），避免 OrderByDescending 创建额外堆包装对象
+        passingScores.Sort();
+        passingScores.Reverse();
+
+        // 映射格式化
+        List<string> processedScores = new List<string>(capacity: passingScores.Count);
+        foreach (int score in passingScores)
+        {
+            processedScores.Add($"Ranked-{score}");
+        }
 
         Console.WriteLine("Passing Scores (Ranked):");
-        foreach (var item in processedScores)
+        // 显式声明类型 string，杜绝 foreach (var ...)
+        foreach (string item in processedScores)
         {
             Console.Write($"{item} ");
         }
         Console.WriteLine();
 
-        // 谓词断言测试 [JS: .some() / .every()]
-        bool hasPerfectScore = rawScores.Any(score => score == 100); // [JS: .some()]
-        bool allPassed = rawScores.All(score => score >= 60);         // [JS: .every()]
+        // 2. 状态断言平铺展开：短路循环替代 LINQ Any/All 委托开销
+        bool hasPerfectScore = false;
+        bool allPassed = true;
+
+        foreach (int score in rawScores)
+        {
+            if (score == 100)
+            {
+                hasPerfectScore = true;
+            }
+
+            if (score < 60)
+            {
+                allPassed = false;
+            }
+        }
 
         Console.WriteLine($"Any Perfect (100): {hasPerfectScore}");
         Console.WriteLine($"All Passed (>=60): {allPassed}");
