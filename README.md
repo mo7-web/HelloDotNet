@@ -9,6 +9,9 @@
 ## 常用开发命令速查
 
 ```bash
+# 下载还原依赖
+dotnet restore
+
 # 诊断环境与 SDK、运行时路径
 dotnet --info
 

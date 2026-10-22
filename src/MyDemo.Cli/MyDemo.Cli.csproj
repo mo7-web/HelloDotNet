@@ -9,4 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../MyDemo.Core/MyDemo.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
 </Project>
